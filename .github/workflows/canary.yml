@@ -1,0 +1,167 @@
+name: Coding Bible release canary
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  project-contract:
+    name: Project scan contract · v0.25.0
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout canary
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Known-bad fixture must be rejected
+        id: bad
+        continue-on-error: true
+        uses: Xanhast-pf/coding-bible@v0.25.0
+        with:
+          scope: project
+          path: fixtures/bad
+          fail-on: error
+
+      - name: Assert rejection contract
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.bad.outcome }}
+          CONCLUSION: ${{ steps.bad.outputs.conclusion }}
+          FINDINGS: ${{ steps.bad.outputs.findings }}
+          ERRORS: ${{ steps.bad.outputs.errors }}
+          DIAGNOSTICS: ${{ steps.bad.outputs.diagnostics }}
+          RULES_CHECKED: ${{ steps.bad.outputs.rules-checked }}
+          SARIF_PATH: ${{ steps.bad.outputs.sarif-path }}
+        run: |
+          set -euo pipefail
+          test "$OUTCOME" = "failure"
+          test "$CONCLUSION" = "failed"
+          test "$FINDINGS" -ge 19
+          test "$ERRORS" -ge 1
+          test "$DIAGNOSTICS" -eq 0
+          test "$RULES_CHECKED" -eq 19
+          test -n "$SARIF_PATH"
+          test -f "$SARIF_PATH"
+
+          node -e '
+            const fs = require("node:fs");
+            const sarif = JSON.parse(fs.readFileSync(process.env.SARIF_PATH, "utf8"));
+            if (sarif.version !== "2.1.0") process.exit(1);
+            const results = sarif.runs?.[0]?.results ?? [];
+            if (results.length < 19) process.exit(1);
+            const actual = [...new Set(results.map((result) => result.ruleId))].sort();
+            const expected = [
+              "A11Y-001", "A11Y-002", "A11Y-004", "CORE-003", "GQL-002",
+              "JS-002", "JS-003", "JS-004", "JS-006", "LEGEND-001",
+              "REACT-006", "REACT-008", "REACT-009", "REACT-010", "REACT-011",
+              "REACT-012", "TS-001", "TS-003", "TS-004",
+            ].sort();
+            if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+              console.error({ actual, expected });
+              process.exit(1);
+            }
+          '
+
+      - name: Known-clean fixture must pass
+        id: good
+        uses: Xanhast-pf/coding-bible@v0.25.0
+        with:
+          scope: project
+          path: fixtures/good
+          fail-on: error
+
+      - name: Assert clean contract
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.good.outcome }}
+          CONCLUSION: ${{ steps.good.outputs.conclusion }}
+          FINDINGS: ${{ steps.good.outputs.findings }}
+          ERRORS: ${{ steps.good.outputs.errors }}
+          WARNINGS: ${{ steps.good.outputs.warnings }}
+          DIAGNOSTICS: ${{ steps.good.outputs.diagnostics }}
+          RULES_CHECKED: ${{ steps.good.outputs.rules-checked }}
+        run: |
+          set -euo pipefail
+          test "$OUTCOME" = "success"
+          test "$CONCLUSION" = "passed"
+          test "$FINDINGS" -eq 0
+          test "$ERRORS" -eq 0
+          test "$WARNINGS" -eq 0
+          test "$DIAGNOSTICS" -eq 0
+          test "$RULES_CHECKED" -eq 19
+
+  changed-lines-contract:
+    name: Changed-line contract · v0.25.0
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout canary
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Create an unpushed test commit
+        id: commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_sha="$(git rev-parse HEAD)"
+
+          git config user.name "coding-bible-canary"
+          git config user.email "coding-bible-canary@users.noreply.github.com"
+
+          cat >> fixtures/changed/probe.ts <<'EOF_INNER'
+
+          // New violation: changed-scope must report this line and only this TS-001.
+          export const introduced: any = "new debt";
+          EOF_INNER
+
+          git add fixtures/changed/probe.ts
+          git commit -m "canary: introduce one new violation"
+          echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
+
+      - name: New violation must be rejected
+        id: changed
+        continue-on-error: true
+        uses: Xanhast-pf/coding-bible@v0.25.0
+        with:
+          scope: changed
+          path: fixtures/changed
+          base-ref: ${{ steps.commit.outputs.base_sha }}
+          fail-on: error
+          sarif: true
+
+      - name: Assert changed-line filtering
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.changed.outcome }}
+          CONCLUSION: ${{ steps.changed.outputs.conclusion }}
+          FINDINGS: ${{ steps.changed.outputs.findings }}
+          ERRORS: ${{ steps.changed.outputs.errors }}
+          DIAGNOSTICS: ${{ steps.changed.outputs.diagnostics }}
+          RULES_CHECKED: ${{ steps.changed.outputs.rules-checked }}
+          SARIF_PATH: ${{ steps.changed.outputs.sarif-path }}
+        run: |
+          set -euo pipefail
+          test "$OUTCOME" = "failure"
+          test "$CONCLUSION" = "failed"
+          test "$FINDINGS" -eq 1
+          test "$ERRORS" -eq 1
+          test "$DIAGNOSTICS" -eq 0
+          test "$RULES_CHECKED" -eq 11
+          test -f "$SARIF_PATH"
+
+          node -e '
+            const fs = require("node:fs");
+            const sarif = JSON.parse(fs.readFileSync(process.env.SARIF_PATH, "utf8"));
+            const results = sarif.runs?.[0]?.results ?? [];
+            if (results.length !== 1) process.exit(1);
+            if (results[0]?.ruleId !== "TS-001") process.exit(1);
+          '

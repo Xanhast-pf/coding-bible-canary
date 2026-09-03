@@ -1,3 +1,4 @@
+// eslint-disable-next-line react-hooks/exhaustive-deps -- canary aggregate contract
 import { gql } from "@apollo/client";
 import { observer } from "@legendapp/state/react";
 import { FormattedMessage } from "react-intl";
@@ -43,6 +44,22 @@ async function redundantAsync() {
 
 function forceUser(value: unknown) {
   return value as User;
+}
+
+
+const manualDateLabel = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
+
+store$.data.set(response.data);
+store$.isLoading.set(false);
+
+export const userStore = configureStore({ reducer: userReducer });
+export const settingsStore = configureStore({ reducer: settingsReducer });
+
+export function useTodo(todoId: string) {
+  return useQuery({
+    queryKey: ["todo"],
+    queryFn: () => fetchTodo(todoId),
+  });
 }
 
 export function Dashboard({ user, users }: Props) {
@@ -112,3 +129,5 @@ void parse;
 void loadUser;
 void redundantAsync;
 void forceUser;
+
+void manualDateLabel;

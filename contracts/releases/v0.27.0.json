@@ -1,0 +1,30 @@
+{
+  "formatVersion": 1,
+  "releaseRef": "v0.27.0",
+  "automatedRuleCount": 23,
+  "ruleIds": [
+    "A11Y-001",
+    "A11Y-002",
+    "A11Y-004",
+    "CORE-003",
+    "GQL-002",
+    "I18N-001",
+    "JS-001",
+    "JS-002",
+    "JS-003",
+    "JS-004",
+    "JS-006",
+    "LEGEND-001",
+    "REACT-004",
+    "REACT-006",
+    "REACT-008",
+    "REACT-009",
+    "REACT-010",
+    "REACT-011",
+    "REACT-012",
+    "TS-001",
+    "TS-003",
+    "TS-004",
+    "TS-007"
+  ]
+}

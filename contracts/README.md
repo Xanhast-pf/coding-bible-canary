@@ -23,3 +23,16 @@ automated set without updating this external contract.
 `framework-projects.json` contains deliberately clean ecosystem-shaped projects.
 They are false-positive pressure tests, not claims that every ecosystem pack is
 already automated.
+
+
+## Automation classification
+
+`automation-matrix.json` is Canary's independent 128-rule automation assessment.
+It distinguishes current automation from high-confidence candidates, contextual
+candidates, intentional human/agent review, and responsibilities that belong to
+another tool. The candidate's automated set must match both `rules.json` and the
+matrix before promotion succeeds.
+
+Historical releases keep frozen contracts under `contracts/releases/`. This
+allows candidate `main` to add detectors while the immutable published lane keeps
+testing exactly what that release promised.

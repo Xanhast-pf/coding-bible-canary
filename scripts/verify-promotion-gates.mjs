@@ -13,6 +13,7 @@ import { generatedMutationNames } from "./lib/mutations.mjs";
 
 const expected = contract();
 const policy = readJson(path.join(root, "contracts/torture-policy.json"));
+const automationMatrix = readJson(path.join(root, "contracts/automation-matrix.json"));
 const adversarial = readJson(path.join(root, "contracts/adversarial.json"));
 const analyzer = await importCandidate("packages/analyzer/src/index.ts");
 
@@ -29,6 +30,14 @@ assert(
   ].join("\n"),
 );
 
+const matrixAutomated = automationMatrix.rules
+  .filter(({ status }) => status === "automated")
+  .map(({ ruleId }) => ruleId)
+  .sort();
+assert(
+  sameSet(matrixAutomated, expectedAutomated),
+  "Automation matrix automated set differs from the promotion contract.",
+);
 assert(
   expectedAutomated.length === policy.automatedRuleCount,
   `Promotion policy denominator ${policy.automatedRuleCount} != ${expectedAutomated.length}.`,

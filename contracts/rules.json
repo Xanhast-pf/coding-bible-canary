@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "catalogRuleCount": 128,
-  "automatedRuleCount": 23,
+  "automatedRuleCount": 27,
   "releaseRef": "v0.27.0",
   "rules": [
     {
@@ -538,10 +538,13 @@
     {
       "ruleId": "I18N-003",
       "pack": "internationalization",
-      "coverage": "catalog-only",
+      "coverage": "automated",
       "canonicalExamplesRequired": true,
       "consumers": [
-        "knowledge"
+        "library",
+        "cli",
+        "browser",
+        "action"
       ]
     },
     {
@@ -664,10 +667,13 @@
     {
       "ruleId": "LEGEND-004",
       "pack": "legend-state",
-      "coverage": "catalog-only",
+      "coverage": "automated",
       "canonicalExamplesRequired": true,
       "consumers": [
-        "knowledge"
+        "library",
+        "cli",
+        "browser",
+        "action"
       ]
     },
     {
@@ -991,10 +997,13 @@
     {
       "ruleId": "REDUX-009",
       "pack": "redux",
-      "coverage": "catalog-only",
+      "coverage": "automated",
       "canonicalExamplesRequired": true,
       "consumers": [
-        "knowledge"
+        "library",
+        "cli",
+        "browser",
+        "action"
       ]
     },
     {
@@ -1018,10 +1027,13 @@
     {
       "ruleId": "TQ-001",
       "pack": "tanstack-query",
-      "coverage": "catalog-only",
+      "coverage": "automated",
       "canonicalExamplesRequired": true,
       "consumers": [
-        "knowledge"
+        "library",
+        "cli",
+        "browser",
+        "action"
       ]
     },
     {

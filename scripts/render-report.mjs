@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { root } from "./lib/conformance.mjs";
+import { automatedRuleIds, root } from "./lib/conformance.mjs";
 
 const directory = path.join(root, "artifacts");
 const names = fs.existsSync(directory)
@@ -15,14 +15,17 @@ const failed = reports.filter(({ data }) => data.status === "failed");
 const mutations = byName.get("mutation-library.json");
 const adversarial = byName.get("adversarial-library.json");
 const frameworks = byName.get("framework-matrix.json");
+const catalog = byName.get("catalog-contract.json");
 const lines = [
   "# Coding Bible Canary Conformance",
   "",
   "- Catalog contract: **128 / 128 rules represented**",
-  "- Automated contract: **23 / 23 rules**",
+  `- Automated contract: **${automatedRuleIds().length} / ${automatedRuleIds().length} rules**`,
   `- Generated mutation cases: **${mutations?.cases ?? "n/a"}**`,
   `- Independent adversarial variants: **${adversarial?.cases ?? "n/a"}**`,
   `- Clean framework/project fixtures: **${frameworks?.projects ?? "n/a"}**`,
+  `- High-confidence candidates queued: **${catalog?.classificationCounts?.["high-confidence-candidate"] ?? "n/a"}**`,
+  `- Contextual candidates tracked: **${catalog?.classificationCounts?.["contextual-candidate"] ?? "n/a"}**`,
   `- Known mutation false positives: **${mutations?.falsePositives ?? "n/a"}**`,
   `- Known mutation false negatives: **${mutations?.falseNegatives ?? "n/a"}**`,
   `- Report artifacts: **${reports.length}**`,

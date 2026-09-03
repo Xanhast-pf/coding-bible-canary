@@ -68,4 +68,4 @@ writeArtifact("browser-parity.json", {
   good: { findingCount: 0 },
   status: "passed",
 });
-console.log(`Browser conformance PASS · 23/23 automated rules represented · clean fixture zero findings`);
+console.log(`Browser conformance PASS · ${automatedRuleIds().length}/${automatedRuleIds().length} automated rules represented · clean fixture zero findings`);

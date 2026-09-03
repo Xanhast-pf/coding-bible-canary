@@ -184,6 +184,38 @@
       "forbid": [
         "I18N-001"
       ]
+    },
+    {
+      "id": "I18N-003-machine-iso-format",
+      "language": "ts",
+      "source": "const machineDate = date.toISOString().slice(0, 10);",
+      "forbid": [
+        "I18N-003"
+      ]
+    },
+    {
+      "id": "LEGEND-004-independent-roots",
+      "language": "ts",
+      "source": "user$.name.set('Ada');\nsettings$.ready.set(true);",
+      "forbid": [
+        "LEGEND-004"
+      ]
+    },
+    {
+      "id": "REDUX-009-store-plus-factory",
+      "language": "ts",
+      "source": "declare const reducer: unknown;\ndeclare function configureStore(options: unknown): unknown;\nexport const store = configureStore({ reducer });\nexport const createTestStore = () => configureStore({ reducer });",
+      "forbid": [
+        "REDUX-009"
+      ]
+    },
+    {
+      "id": "TQ-001-complete-query-key",
+      "language": "ts",
+      "source": "declare function useQuery(options: unknown): unknown;\ndeclare function fetchTodo(id: string): unknown;\ndeclare const todoId: string;\nexport const useTodo = () => useQuery({ queryKey: ['todo', todoId], queryFn: () => fetchTodo(todoId) });",
+      "forbid": [
+        "TQ-001"
+      ]
     }
   ]
 }

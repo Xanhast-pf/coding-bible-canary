@@ -12,8 +12,13 @@ candidate product drifts from an independently checked-in contract.
 The canary owns two hard denominators:
 
 - **128 / 128 Coding Bible rules represented** in `contracts/rules.json`;
-- **23 / 23 currently automated rules** required to satisfy external detection
+- **27 / 27 candidate automated rules** required to satisfy external detection
   contracts.
+
+`contracts/automation-matrix.json` independently classifies all 128 rules as
+automated, high-confidence candidates, contextual candidates, human/agent review,
+or external-tool responsibilities. This is intentionally checked in rather than
+derived from Coding Bible at runtime.
 
 Every rule is covered even when it is not automated. `catalog-only` rules must
 still exist with complete title, summary, rationale, canonical DON'T code, and
@@ -71,6 +76,10 @@ uses: Xanhast-pf/coding-bible@v0.27.0
 
 That lane answers a different question: does the exact artifact users already
 consume still behave as promised?
+
+The published lane uses `contracts/releases/v0.27.0.json`, a frozen 23-rule
+release contract. Candidate coverage can therefore grow without rewriting the
+historical expectations for the immutable release.
 
 ## Detector promotion gate
 

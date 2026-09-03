@@ -308,6 +308,7 @@ jobs:
           DIAGNOSTICS: ${{ steps.bad.outputs.diagnostics }}
           RULES_CHECKED: ${{ steps.bad.outputs.rules-checked }}
           SARIF_PATH: ${{ steps.bad.outputs.sarif-path }}
+          EXPECTED_RULE_CONTRACT: contracts/releases/v0.27.0.json
         run: node scripts/assert-action-output.mjs bad
 
       - name: Published known-clean fixture must pass
@@ -327,6 +328,7 @@ jobs:
           WARNINGS: ${{ steps.good.outputs.warnings }}
           DIAGNOSTICS: ${{ steps.good.outputs.diagnostics }}
           RULES_CHECKED: ${{ steps.good.outputs.rules-checked }}
+          EXPECTED_RULE_CONTRACT: contracts/releases/v0.27.0.json
         run: node scripts/assert-action-output.mjs good
 
   changed-lines-contract:

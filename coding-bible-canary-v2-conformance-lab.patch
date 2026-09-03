@@ -1,0 +1,1616 @@
+diff --git a/.github/workflows/canary.yml b/.github/workflows/canary.yml
+index 40464541b7e17f4d1427eec8871e158e8b99f0bf..8b88d101bea9ce60d148571328674f943149976e 100644
+--- a/.github/workflows/canary.yml
++++ b/.github/workflows/canary.yml
+@@ -308,6 +308,7 @@ jobs:
+           DIAGNOSTICS: ${{ steps.bad.outputs.diagnostics }}
+           RULES_CHECKED: ${{ steps.bad.outputs.rules-checked }}
+           SARIF_PATH: ${{ steps.bad.outputs.sarif-path }}
++          EXPECTED_RULE_CONTRACT: contracts/releases/v0.27.0.json
+         run: node scripts/assert-action-output.mjs bad
+ 
+       - name: Published known-clean fixture must pass
+@@ -327,6 +328,7 @@ jobs:
+           WARNINGS: ${{ steps.good.outputs.warnings }}
+           DIAGNOSTICS: ${{ steps.good.outputs.diagnostics }}
+           RULES_CHECKED: ${{ steps.good.outputs.rules-checked }}
++          EXPECTED_RULE_CONTRACT: contracts/releases/v0.27.0.json
+         run: node scripts/assert-action-output.mjs good
+ 
+   changed-lines-contract:
+diff --git a/README.md b/README.md
+index bd8efa91476b2326f3908c8327ffa62b157edcb7..3dadc568eaca6da89426e6dcf6bf0de348844954 100644
+--- a/README.md
++++ b/README.md
+@@ -12,9 +12,14 @@ candidate product drifts from an independently checked-in contract.
+ The canary owns two hard denominators:
+ 
+ - **128 / 128 Coding Bible rules represented** in `contracts/rules.json`;
+-- **23 / 23 currently automated rules** required to satisfy external detection
++- **27 / 27 candidate automated rules** required to satisfy external detection
+   contracts.
+ 
++`contracts/automation-matrix.json` independently classifies all 128 rules as
++automated, high-confidence candidates, contextual candidates, human/agent review,
++or external-tool responsibilities. This is intentionally checked in rather than
++derived from Coding Bible at runtime.
++
+ Every rule is covered even when it is not automated. `catalog-only` rules must
+ still exist with complete title, summary, rationale, canonical DON'T code, and
+ canonical DO code. They are deliberately **not** required to emit analyzer
+@@ -72,6 +77,10 @@ uses: Xanhast-pf/coding-bible@v0.27.0
+ That lane answers a different question: does the exact artifact users already
+ consume still behave as promised?
+ 
++The published lane uses `contracts/releases/v0.27.0.json`, a frozen 23-rule
++release contract. Candidate coverage can therefore grow without rewriting the
++historical expectations for the immutable release.
++
+ ## Detector promotion gate
+ 
+ Canary treats `automated` as a promotion with prerequisites, not a metadata
+diff --git a/contracts/README.md b/contracts/README.md
+index 95e54d35c91f306c46b4797c90fa900379bdb438..1ae60a6a7543389d3fb5eb73963e84047106e7c8 100644
+--- a/contracts/README.md
++++ b/contracts/README.md
+@@ -23,3 +23,16 @@ automated set without updating this external contract.
+ `framework-projects.json` contains deliberately clean ecosystem-shaped projects.
+ They are false-positive pressure tests, not claims that every ecosystem pack is
+ already automated.
++
++
++## Automation classification
++
++`automation-matrix.json` is Canary's independent 128-rule automation assessment.
++It distinguishes current automation from high-confidence candidates, contextual
++candidates, intentional human/agent review, and responsibilities that belong to
++another tool. The candidate's automated set must match both `rules.json` and the
++matrix before promotion succeeds.
++
++Historical releases keep frozen contracts under `contracts/releases/`. This
++allows candidate `main` to add detectors while the immutable published lane keeps
++testing exactly what that release promised.
+diff --git a/contracts/adversarial.json b/contracts/adversarial.json
+index 26d2c60b9faf01829813b67ae6abdf94c30563f1..6bfbe581f63c1dcc16c5dca63948b3edccf61fb1 100644
+--- a/contracts/adversarial.json
++++ b/contracts/adversarial.json
+@@ -184,6 +184,38 @@
+       "forbid": [
+         "I18N-001"
+       ]
++    },
++    {
++      "id": "I18N-003-machine-iso-format",
++      "language": "ts",
++      "source": "const machineDate = date.toISOString().slice(0, 10);",
++      "forbid": [
++        "I18N-003"
++      ]
++    },
++    {
++      "id": "LEGEND-004-independent-roots",
++      "language": "ts",
++      "source": "user$.name.set('Ada');\nsettings$.ready.set(true);",
++      "forbid": [
++        "LEGEND-004"
++      ]
++    },
++    {
++      "id": "REDUX-009-store-plus-factory",
++      "language": "ts",
++      "source": "declare const reducer: unknown;\ndeclare function configureStore(options: unknown): unknown;\nexport const store = configureStore({ reducer });\nexport const createTestStore = () => configureStore({ reducer });",
++      "forbid": [
++        "REDUX-009"
++      ]
++    },
++    {
++      "id": "TQ-001-complete-query-key",
++      "language": "ts",
++      "source": "declare function useQuery(options: unknown): unknown;\ndeclare function fetchTodo(id: string): unknown;\ndeclare const todoId: string;\nexport const useTodo = () => useQuery({ queryKey: ['todo', todoId], queryFn: () => fetchTodo(todoId) });",
++      "forbid": [
++        "TQ-001"
++      ]
+     }
+   ]
+ }
+diff --git a/contracts/automation-matrix.json b/contracts/automation-matrix.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..4c3f6a633c9a0164b30d7bb6e559839d9f2d44a7
+--- /dev/null
++++ b/contracts/automation-matrix.json
+@@ -0,0 +1,1005 @@
++{
++  "formatVersion": 1,
++  "catalogRuleCount": 128,
++  "automatedRuleCount": 27,
++  "classificationPrinciple": "Canary independently classifies every rule; automated is a promotion contract, not a synonym for detectable.",
++  "rules": [
++    {
++      "ruleId": "A11Y-001",
++      "pack": "accessibility",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "A11Y-002",
++      "pack": "accessibility",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "A11Y-003",
++      "pack": "accessibility",
++      "status": "high-confidence-candidate",
++      "priorityScore": 84,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs style/CSS evidence that focus indicators are not removed without an equivalent visible replacement."
++    },
++    {
++      "ruleId": "A11Y-004",
++      "pack": "accessibility",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "A11Y-005",
++      "pack": "accessibility",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "A11Y-006",
++      "pack": "accessibility",
++      "status": "high-confidence-candidate",
++      "priorityScore": 82,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs style/CSS animation evidence plus reduced-motion handling."
++    },
++    {
++      "ruleId": "AI-001",
++      "pack": "ai",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "AI-002",
++      "pack": "ai",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "AI-003",
++      "pack": "ai",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "AI-004",
++      "pack": "ai",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "AI-005",
++      "pack": "ai",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "AI-006",
++      "pack": "ai",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "AI-007",
++      "pack": "ai",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "APOLLO-001",
++      "pack": "apollo",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "APOLLO-002",
++      "pack": "apollo",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "APOLLO-003",
++      "pack": "apollo",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "APOLLO-004",
++      "pack": "apollo",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "APOLLO-005",
++      "pack": "apollo",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "APOLLO-006",
++      "pack": "apollo",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "ARCH-001",
++      "pack": "architecture",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "ARCH-002",
++      "pack": "architecture",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "ARCH-003",
++      "pack": "architecture",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "ARCH-004",
++      "pack": "architecture",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "ARCH-005",
++      "pack": "architecture",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "ARCH-006",
++      "pack": "architecture",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "ARCH-007",
++      "pack": "architecture",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "CORE-001",
++      "pack": "core",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "CORE-002",
++      "pack": "core",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "CORE-003",
++      "pack": "core",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "CORE-004",
++      "pack": "core",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "CORE-005",
++      "pack": "core",
++      "status": "external-tool",
++      "priorityScore": 0,
++      "reason": "An established tool owns the primary diagnostic more directly.",
++      "blocker": "Dead-code ownership is primarily TypeScript/ESLint/Knip; Coding Bible should consume or contextualize those signals rather than duplicate them."
++    },
++    {
++      "ruleId": "CORE-006",
++      "pack": "core",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "CORE-007",
++      "pack": "core",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "CORE-008",
++      "pack": "core",
++      "status": "contextual-candidate",
++      "priorityScore": 44,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "CORE-009",
++      "pack": "core",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "CORE-010",
++      "pack": "core",
++      "status": "contextual-candidate",
++      "priorityScore": 63,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "CORE-011",
++      "pack": "core",
++      "status": "contextual-candidate",
++      "priorityScore": 51,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "CSS-001",
++      "pack": "css",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "CSS-002",
++      "pack": "css",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "CSS-003",
++      "pack": "css",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "CSS-004",
++      "pack": "css",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "DEP-001",
++      "pack": "dependencies",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "DEP-002",
++      "pack": "dependencies",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "DEP-003",
++      "pack": "dependencies",
++      "status": "external-tool",
++      "priorityScore": 0,
++      "reason": "An established tool owns the primary diagnostic more directly.",
++      "blocker": "Unused dependency detection is already owned well by Knip/package tooling."
++    },
++    {
++      "ruleId": "DEP-004",
++      "pack": "dependencies",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "FLAG-001",
++      "pack": "feature-flags",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "FLAG-002",
++      "pack": "feature-flags",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "FLAG-003",
++      "pack": "feature-flags",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "FLAG-004",
++      "pack": "feature-flags",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "GQL-001",
++      "pack": "graphql",
++      "status": "high-confidence-candidate",
++      "priorityScore": 92,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs standalone GraphQL source support or a clearly documented embedded-document-only contract."
++    },
++    {
++      "ruleId": "GQL-002",
++      "pack": "graphql",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "GQL-003",
++      "pack": "graphql",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "GQL-004",
++      "pack": "graphql",
++      "status": "external-tool",
++      "priorityScore": 0,
++      "reason": "An established tool owns the primary diagnostic more directly.",
++      "blocker": "Schema validation is best delegated to GraphQL validation/codegen/lint tooling with the actual schema."
++    },
++    {
++      "ruleId": "GQL-005",
++      "pack": "graphql",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "GQL-006",
++      "pack": "graphql",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "I18N-001",
++      "pack": "internationalization",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "I18N-002",
++      "pack": "internationalization",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "I18N-003",
++      "pack": "internationalization",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "I18N-004",
++      "pack": "internationalization",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "JS-001",
++      "pack": "javascript",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "JS-002",
++      "pack": "javascript",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "JS-003",
++      "pack": "javascript",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "JS-004",
++      "pack": "javascript",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "JS-005",
++      "pack": "javascript",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "JS-006",
++      "pack": "javascript",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "JS-007",
++      "pack": "javascript",
++      "status": "contextual-candidate",
++      "priorityScore": 44,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "LEGEND-001",
++      "pack": "legend-state",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "LEGEND-002",
++      "pack": "legend-state",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "LEGEND-003",
++      "pack": "legend-state",
++      "status": "high-confidence-candidate",
++      "priorityScore": 88,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs Legend observable symbol identity and mutation-flow checks around peek()/set()."
++    },
++    {
++      "ruleId": "LEGEND-004",
++      "pack": "legend-state",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "LEGEND-005",
++      "pack": "legend-state",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "LEGEND-006",
++      "pack": "legend-state",
++      "status": "high-confidence-candidate",
++      "priorityScore": 80,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs persistence/sync API identity plus conservative serializability analysis."
++    },
++    {
++      "ruleId": "NEXT-001",
++      "pack": "nextjs",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "NEXT-002",
++      "pack": "nextjs",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "NEXT-003",
++      "pack": "nextjs",
++      "status": "high-confidence-candidate",
++      "priorityScore": 91,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs project-aware Server/Client Component boundary resolution and prop-value serializability."
++    },
++    {
++      "ruleId": "NEXT-004",
++      "pack": "nextjs",
++      "status": "high-confidence-candidate",
++      "priorityScore": 93,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs project import-graph analysis for client-to-server-only leakage."
++    },
++    {
++      "ruleId": "NEXT-005",
++      "pack": "nextjs",
++      "status": "high-confidence-candidate",
++      "priorityScore": 83,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs Server Component identification plus conservative same-app HTTP indirection detection."
++    },
++    {
++      "ruleId": "NEXT-006",
++      "pack": "nextjs",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "PERF-001",
++      "pack": "performance",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "PERF-002",
++      "pack": "performance",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "PERF-003",
++      "pack": "performance",
++      "status": "contextual-candidate",
++      "priorityScore": 44,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "PERF-004",
++      "pack": "performance",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "REACT-001",
++      "pack": "react",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "REACT-002",
++      "pack": "react",
++      "status": "contextual-candidate",
++      "priorityScore": 44,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "REACT-003",
++      "pack": "react",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "REACT-004",
++      "pack": "react",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "REACT-005",
++      "pack": "react",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "REACT-006",
++      "pack": "react",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "REACT-007",
++      "pack": "react",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "REACT-008",
++      "pack": "react",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "REACT-009",
++      "pack": "react",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "REACT-010",
++      "pack": "react",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "REACT-011",
++      "pack": "react",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "REACT-012",
++      "pack": "react",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "REACT-013",
++      "pack": "react",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "REDUX-001",
++      "pack": "redux",
++      "status": "high-confidence-candidate",
++      "priorityScore": 86,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs precise Redux identity/legacy-pattern detection without treating every reducer switch as Redux."
++    },
++    {
++      "ruleId": "REDUX-002",
++      "pack": "redux",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "REDUX-003",
++      "pack": "redux",
++      "status": "high-confidence-candidate",
++      "priorityScore": 84,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs Redux state/action boundary identification plus conservative serializability checks."
++    },
++    {
++      "ruleId": "REDUX-004",
++      "pack": "redux",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "REDUX-005",
++      "pack": "redux",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "REDUX-006",
++      "pack": "redux",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "REDUX-007",
++      "pack": "redux",
++      "status": "contextual-candidate",
++      "priorityScore": 44,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "REDUX-008",
++      "pack": "redux",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "REDUX-009",
++      "pack": "redux",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "REDUX-010",
++      "pack": "redux",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "REDUX-011",
++      "pack": "redux",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "TQ-001",
++      "pack": "tanstack-query",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "TQ-002",
++      "pack": "tanstack-query",
++      "status": "high-confidence-candidate",
++      "priorityScore": 89,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs query-key AST/value analysis for unstable or non-serializable identity."
++    },
++    {
++      "ruleId": "TQ-003",
++      "pack": "tanstack-query",
++      "status": "contextual-candidate",
++      "priorityScore": 56,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "TQ-004",
++      "pack": "tanstack-query",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "TQ-005",
++      "pack": "tanstack-query",
++      "status": "high-confidence-candidate",
++      "priorityScore": 90,
++      "reason": "A narrow static/project-aware detector appears defensible with strong negative coverage.",
++      "blocker": "Needs query-function identity tracing so fetch response checks are enforced only for actual query functions."
++    },
++    {
++      "ruleId": "TEST-001",
++      "pack": "testing",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "TEST-002",
++      "pack": "testing",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "TEST-003",
++      "pack": "testing",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "TEST-004",
++      "pack": "testing",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "TEST-005",
++      "pack": "testing",
++      "status": "contextual-candidate",
++      "priorityScore": 44,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "TEST-006",
++      "pack": "testing",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "TS-001",
++      "pack": "typescript",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "TS-002",
++      "pack": "typescript",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "TS-003",
++      "pack": "typescript",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "TS-004",
++      "pack": "typescript",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "TS-005",
++      "pack": "typescript",
++      "status": "contextual-candidate",
++      "priorityScore": 68,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "TS-006",
++      "pack": "typescript",
++      "status": "contextual-candidate",
++      "priorityScore": 44,
++      "reason": "Potentially automatable as a contextual/strong finding, but not safe enough for a hard detector yet.",
++      "blocker": "Static evidence can likely surface useful signals, but the conclusion needs context or a tighter detector contract before promotion."
++    },
++    {
++      "ruleId": "TS-007",
++      "pack": "typescript",
++      "status": "automated",
++      "priorityScore": 100,
++      "reason": "Implemented in the shared analyzer and required by Canary promotion contracts."
++    },
++    {
++      "ruleId": "WORK-001",
++      "pack": "workflow",
++      "status": "external-tool",
++      "priorityScore": 0,
++      "reason": "An established tool owns the primary diagnostic more directly.",
++      "blocker": "Whether checks ran is a CI/workflow fact, not a source-code detector responsibility."
++    },
++    {
++      "ruleId": "WORK-002",
++      "pack": "workflow",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "WORK-003",
++      "pack": "workflow",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    },
++    {
++      "ruleId": "WORK-004",
++      "pack": "workflow",
++      "status": "human-agent-review",
++      "priorityScore": 20,
++      "reason": "Keep as canonical guidance for humans/agents rather than forcing a heuristic detector.",
++      "blocker": "Requires engineering intent, architecture, product context, or review history that static analysis should not guess."
++    }
++  ]
++}
+diff --git a/contracts/releases/v0.27.0.json b/contracts/releases/v0.27.0.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..eb41a133d2eefe0a20ec9b4cc000b2e42a74cf28
+--- /dev/null
++++ b/contracts/releases/v0.27.0.json
+@@ -0,0 +1,30 @@
++{
++  "formatVersion": 1,
++  "releaseRef": "v0.27.0",
++  "automatedRuleCount": 23,
++  "ruleIds": [
++    "A11Y-001",
++    "A11Y-002",
++    "A11Y-004",
++    "CORE-003",
++    "GQL-002",
++    "I18N-001",
++    "JS-001",
++    "JS-002",
++    "JS-003",
++    "JS-004",
++    "JS-006",
++    "LEGEND-001",
++    "REACT-004",
++    "REACT-006",
++    "REACT-008",
++    "REACT-009",
++    "REACT-010",
++    "REACT-011",
++    "REACT-012",
++    "TS-001",
++    "TS-003",
++    "TS-004",
++    "TS-007"
++  ]
++}
+diff --git a/contracts/rules.json b/contracts/rules.json
+index ae7c5e799bc957d036ead8837f7fdc807e375b20..e583843508e2d0e9428445823d7b18e6eb74c838 100644
+--- a/contracts/rules.json
++++ b/contracts/rules.json
+@@ -1,7 +1,7 @@
+ {
+   "formatVersion": 1,
+   "catalogRuleCount": 128,
+-  "automatedRuleCount": 23,
++  "automatedRuleCount": 27,
+   "releaseRef": "v0.27.0",
+   "rules": [
+     {
+@@ -538,10 +538,13 @@
+     {
+       "ruleId": "I18N-003",
+       "pack": "internationalization",
+-      "coverage": "catalog-only",
++      "coverage": "automated",
+       "canonicalExamplesRequired": true,
+       "consumers": [
+-        "knowledge"
++        "library",
++        "cli",
++        "browser",
++        "action"
+       ]
+     },
+     {
+@@ -664,10 +667,13 @@
+     {
+       "ruleId": "LEGEND-004",
+       "pack": "legend-state",
+-      "coverage": "catalog-only",
++      "coverage": "automated",
+       "canonicalExamplesRequired": true,
+       "consumers": [
+-        "knowledge"
++        "library",
++        "cli",
++        "browser",
++        "action"
+       ]
+     },
+     {
+@@ -991,10 +997,13 @@
+     {
+       "ruleId": "REDUX-009",
+       "pack": "redux",
+-      "coverage": "catalog-only",
++      "coverage": "automated",
+       "canonicalExamplesRequired": true,
+       "consumers": [
+-        "knowledge"
++        "library",
++        "cli",
++        "browser",
++        "action"
+       ]
+     },
+     {
+@@ -1018,10 +1027,13 @@
+     {
+       "ruleId": "TQ-001",
+       "pack": "tanstack-query",
+-      "coverage": "catalog-only",
++      "coverage": "automated",
+       "canonicalExamplesRequired": true,
+       "consumers": [
+-        "knowledge"
++        "library",
++        "cli",
++        "browser",
++        "action"
+       ]
+     },
+     {
+diff --git a/contracts/torture-policy.json b/contracts/torture-policy.json
+index cc634cc4da38f29b4589a53c8a6a3a071c75893f..da18697677ebc7d01373b19d63db8f7aa55a9248 100644
+--- a/contracts/torture-policy.json
++++ b/contracts/torture-policy.json
+@@ -1,17 +1,17 @@
+ {
+   "formatVersion": 1,
+-  "automatedRuleCount": 23,
+-  "canonicalCases": 46,
++  "automatedRuleCount": 27,
++  "canonicalCases": 54,
+   "generatedVariants": [
+     "leading-comment",
+     "trailing-comment",
+     "safe-module-const",
+     "safe-helper"
+   ],
+-  "generatedMutationCases": 184,
++  "generatedMutationCases": 216,
+   "minimumIndependentAdversarialCasesPerAutomatedRule": 1,
+-  "independentAdversarialBaseCases": 23,
+-  "independentAdversarialCasesWithVariants": 115,
++  "independentAdversarialBaseCases": 27,
++  "independentAdversarialCasesWithVariants": 135,
+   "requiredConsumers": [
+     "library",
+     "cli",
+diff --git a/fixtures/bad/all-violations.tsx b/fixtures/bad/all-violations.tsx
+index 3ba141196480536854acdf4b36199695b1ce2fd4..a7973a936fa002132543f01a87db3e948aec3ce5 100644
+--- a/fixtures/bad/all-violations.tsx
++++ b/fixtures/bad/all-violations.tsx
+@@ -1,3 +1,4 @@
++// eslint-disable-next-line react-hooks/exhaustive-deps -- canary aggregate contract
+ import { gql } from "@apollo/client";
+ import { observer } from "@legendapp/state/react";
+ import { FormattedMessage } from "react-intl";
+@@ -45,6 +46,22 @@ function forceUser(value: unknown) {
+   return value as User;
+ }
+ 
++
++const manualDateLabel = `${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`;
++
++store$.data.set(response.data);
++store$.isLoading.set(false);
++
++export const userStore = configureStore({ reducer: userReducer });
++export const settingsStore = configureStore({ reducer: settingsReducer });
++
++export function useTodo(todoId: string) {
++  return useQuery({
++    queryKey: ["todo"],
++    queryFn: () => fetchTodo(todoId),
++  });
++}
++
+ export function Dashboard({ user, users }: Props) {
+   let activeUser = user;
+   const city = user && user.address && user.address.city;
+@@ -112,3 +129,5 @@ void parse;
+ void loadUser;
+ void redundantAsync;
+ void forceUser;
++
++void manualDateLabel;
+diff --git a/fixtures/good/all-clean.tsx b/fixtures/good/all-clean.tsx
+index 3d9376203c69dcfa03a07da80cf68289b33a3b7a..e766940ebeae72e38ac8870f0ecdf615e1f5ebae 100644
+--- a/fixtures/good/all-clean.tsx
++++ b/fixtures/good/all-clean.tsx
+@@ -45,6 +45,27 @@ async function loadUser(response: Response): Promise<User> {
+   return raw;
+ }
+ 
++
++const localeDateLabel = new Intl.DateTimeFormat(locale, {
++  dateStyle: "medium",
++}).format(today);
++
++store$.assign({ data: response.data, isLoading: false });
++
++export const store = configureStore({
++  reducer: {
++    settings: settingsReducer,
++    user: userReducer,
++  },
++});
++
++export function useTodo(todoId: string) {
++  return useQuery({
++    queryKey: ["todo", todoId],
++    queryFn: () => fetchTodo(todoId),
++  });
++}
++
+ export function Dashboard({ user, users }: Props) {
+   const activeUser = user;
+   const city = user?.address?.city;
+@@ -88,3 +109,5 @@ export function Dashboard({ user, users }: Props) {
+ void normalize;
+ void parse;
+ void loadUser;
++
++void localeDateLabel;
+diff --git a/scripts/assert-action-output.mjs b/scripts/assert-action-output.mjs
+index c7071bfc5b186587aededea7e59b8f27bbc9aec6..9154482345c2bfa1418ed0b2f6cba976ac034b1a 100644
+--- a/scripts/assert-action-output.mjs
++++ b/scripts/assert-action-output.mjs
+@@ -6,6 +6,11 @@ import {
+ } from "./lib/conformance.mjs";
+ 
+ const mode = process.argv[2];
++const expectedContractPath = process.env.EXPECTED_RULE_CONTRACT;
++const expectedRuleIds = expectedContractPath
++  ? JSON.parse(fs.readFileSync(expectedContractPath, "utf8")).ruleIds.toSorted()
++  : automatedRuleIds();
++const expectedRuleCount = expectedRuleIds.length;
+ const findings = Number(process.env.FINDINGS ?? -1);
+ const errors = Number(process.env.ERRORS ?? -1);
+ const warnings = Number(process.env.WARNINGS ?? -1);
+@@ -19,7 +24,7 @@ if (mode === "good") {
+   assert(conclusion === "passed", `Clean Action conclusion was ${conclusion}.`);
+   assert(findings === 0 && errors === 0 && warnings === 0, "Clean Action fixture produced findings.");
+   assert(diagnostics === 0, "Clean Action fixture produced diagnostics.");
+-  assert(rulesChecked === 23, `Clean Action checked ${rulesChecked} rules, expected 23.`);
++  assert(rulesChecked === expectedRuleCount, `Clean Action checked ${rulesChecked} rules, expected ${expectedRuleCount}.`);
+   console.log("Action clean contract PASS");
+   process.exit(0);
+ }
+@@ -27,16 +32,16 @@ if (mode === "good") {
+ if (mode === "bad") {
+   assert(outcome === "failure", `Bad Action outcome was ${outcome}.`);
+   assert(conclusion === "failed", `Bad Action conclusion was ${conclusion}.`);
+-  assert(findings >= 23 && errors >= 1, "Bad Action fixture was not rejected with findings.");
++  assert(findings >= expectedRuleCount && errors >= 1, "Bad Action fixture was not rejected with findings.");
+   assert(diagnostics === 0, "Bad Action fixture produced diagnostics.");
+-  assert(rulesChecked === 23, `Bad Action checked ${rulesChecked} rules, expected 23.`);
++  assert(rulesChecked === expectedRuleCount, `Bad Action checked ${rulesChecked} rules, expected ${expectedRuleCount}.`);
+   const sarifPath = process.env.SARIF_PATH;
+   assert(sarifPath && fs.existsSync(sarifPath), "Bad Action did not produce SARIF.");
+   const sarif = JSON.parse(fs.readFileSync(sarifPath, "utf8"));
+   assert(sarif.version === "2.1.0", `Unexpected SARIF version ${sarif.version}.`);
+   const actual = (sarif.runs?.[0]?.results ?? []).map(({ ruleId }) => ruleId);
+-  assert(sameSet(actual, automatedRuleIds()), `Action SARIF automated-rule set drifted.\n${JSON.stringify([...new Set(actual)].sort(), null, 2)}`);
+-  console.log("Action bad/SARIF contract PASS · 23/23 automated rules represented");
++  assert(sameSet(actual, expectedRuleIds), `Action SARIF automated-rule set drifted.\nExpected: ${JSON.stringify(expectedRuleIds, null, 2)}\nActual: ${JSON.stringify([...new Set(actual)].sort(), null, 2)}`);
++  console.log(`Action bad/SARIF contract PASS · ${expectedRuleCount}/${expectedRuleCount} automated rules represented`);
+   process.exit(0);
+ }
+ 
+diff --git a/scripts/render-report.mjs b/scripts/render-report.mjs
+index 3a2f1b6a066ba9affe12d79bf9a473fa4e5604c4..6a93496700d7bcfdec4ce4644984fba7226313be 100644
+--- a/scripts/render-report.mjs
++++ b/scripts/render-report.mjs
+@@ -1,6 +1,6 @@
+ import fs from "node:fs";
+ import path from "node:path";
+-import { root } from "./lib/conformance.mjs";
++import { automatedRuleIds, root } from "./lib/conformance.mjs";
+ 
+ const directory = path.join(root, "artifacts");
+ const names = fs.existsSync(directory)
+@@ -15,14 +15,17 @@ const failed = reports.filter(({ data }) => data.status === "failed");
+ const mutations = byName.get("mutation-library.json");
+ const adversarial = byName.get("adversarial-library.json");
+ const frameworks = byName.get("framework-matrix.json");
++const catalog = byName.get("catalog-contract.json");
+ const lines = [
+   "# Coding Bible Canary Conformance",
+   "",
+   "- Catalog contract: **128 / 128 rules represented**",
+-  "- Automated contract: **23 / 23 rules**",
++  `- Automated contract: **${automatedRuleIds().length} / ${automatedRuleIds().length} rules**`,
+   `- Generated mutation cases: **${mutations?.cases ?? "n/a"}**`,
+   `- Independent adversarial variants: **${adversarial?.cases ?? "n/a"}**`,
+   `- Clean framework/project fixtures: **${frameworks?.projects ?? "n/a"}**`,
++  `- High-confidence candidates queued: **${catalog?.classificationCounts?.["high-confidence-candidate"] ?? "n/a"}**`,
++  `- Contextual candidates tracked: **${catalog?.classificationCounts?.["contextual-candidate"] ?? "n/a"}**`,
+   `- Known mutation false positives: **${mutations?.falsePositives ?? "n/a"}**`,
+   `- Known mutation false negatives: **${mutations?.falseNegatives ?? "n/a"}**`,
+   `- Report artifacts: **${reports.length}**`,
+diff --git a/scripts/run-browser-parity.mjs b/scripts/run-browser-parity.mjs
+index 2ea4614410e41cdb1766045d7e6850912e61d939..b3a7d0a46c18143fd58736f06ac6138cdca46b7b 100644
+--- a/scripts/run-browser-parity.mjs
++++ b/scripts/run-browser-parity.mjs
+@@ -68,4 +68,4 @@ writeArtifact("browser-parity.json", {
+   good: { findingCount: 0 },
+   status: "passed",
+ });
+-console.log(`Browser conformance PASS · 23/23 automated rules represented · clean fixture zero findings`);
++console.log(`Browser conformance PASS · ${automatedRuleIds().length}/${automatedRuleIds().length} automated rules represented · clean fixture zero findings`);
+diff --git a/scripts/run-cli-conformance.mjs b/scripts/run-cli-conformance.mjs
+index 996cc21fcdfb7057e7c1deaecf086ba85e98b8aa..c8ffa75f4b3acee6b5f7b4c61adbc1b13998f1b1 100644
+--- a/scripts/run-cli-conformance.mjs
++++ b/scripts/run-cli-conformance.mjs
+@@ -38,9 +38,10 @@ const badIds = bad.report.findings.map(({ ruleId }) => ruleId);
+ 
+ assert(bad.status === 1, `Known-bad CLI fixture should exit 1, got ${bad.status}.`);
+ assert(good.status === 0, `Known-clean CLI fixture should exit 0, got ${good.status}.`);
+-assert(sameSet(badIds, automatedRuleIds()), `CLI bad fixture did not cover the exact 23-rule automated contract.\n${JSON.stringify([...new Set(badIds)].sort(), null, 2)}`);
+-assert(bad.report.summary.rulesChecked === 23, `CLI bad fixture checked ${bad.report.summary.rulesChecked} rules, expected 23.`);
+-assert(good.report.summary.rulesChecked === 23, `CLI good fixture checked ${good.report.summary.rulesChecked} rules, expected 23.`);
++const expectedAutomated = automatedRuleIds();
++assert(sameSet(badIds, expectedAutomated), `CLI bad fixture did not cover the exact ${expectedAutomated.length}-rule automated contract.\n${JSON.stringify([...new Set(badIds)].sort(), null, 2)}`);
++assert(bad.report.summary.rulesChecked === expectedAutomated.length, `CLI bad fixture checked ${bad.report.summary.rulesChecked} rules, expected ${expectedAutomated.length}.`);
++assert(good.report.summary.rulesChecked === expectedAutomated.length, `CLI good fixture checked ${good.report.summary.rulesChecked} rules, expected ${expectedAutomated.length}.`);
+ assert(good.report.summary.findings === 0, `CLI good fixture produced ${good.report.summary.findings} findings.`);
+ assert(good.report.summary.diagnostics === 0, `CLI good fixture produced diagnostics.`);
+ 
+@@ -57,4 +58,4 @@ writeArtifact("cli-parity.json", {
+   },
+   status: "passed",
+ });
+-console.log(`CLI conformance PASS · 23/23 automated rules rejected · clean fixture zero findings`);
++console.log(`CLI conformance PASS · ${expectedAutomated.length}/${expectedAutomated.length} automated rules rejected · clean fixture zero findings`);
+diff --git a/scripts/test/contracts.test.mjs b/scripts/test/contracts.test.mjs
+index 9ad2fccb4f05e954f802ef0bc16fabec618796cc..faf8c12301ea6f6240ca685ac601dacd4b8ed415 100644
+--- a/scripts/test/contracts.test.mjs
++++ b/scripts/test/contracts.test.mjs
+@@ -8,6 +8,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
+ const contract = JSON.parse(fs.readFileSync(path.join(root, "contracts/rules.json"), "utf8"));
+ const adversarial = JSON.parse(fs.readFileSync(path.join(root, "contracts/adversarial.json"), "utf8"));
+ const torture = JSON.parse(fs.readFileSync(path.join(root, "contracts/torture-policy.json"), "utf8"));
++const automationMatrix = JSON.parse(fs.readFileSync(path.join(root, "contracts/automation-matrix.json"), "utf8"));
++const releaseV027 = JSON.parse(fs.readFileSync(path.join(root, "contracts/releases/v0.27.0.json"), "utf8"));
+ const frameworks = JSON.parse(fs.readFileSync(path.join(root, "contracts/framework-projects.json"), "utf8"));
+ const workflow = fs.readFileSync(path.join(root, ".github/workflows/canary.yml"), "utf8");
+ 
+@@ -15,8 +17,8 @@ test("canary owns a complete 128-rule independent contract", () => {
+   assert.equal(contract.catalogRuleCount, 128);
+   assert.equal(contract.rules.length, 128);
+   assert.equal(new Set(contract.rules.map(({ ruleId }) => ruleId)).size, 128);
+-  assert.equal(contract.rules.filter(({ coverage }) => coverage === "automated").length, 23);
+-  assert.equal(contract.rules.filter(({ coverage }) => coverage === "catalog-only").length, 105);
++  assert.equal(contract.rules.filter(({ coverage }) => coverage === "automated").length, 27);
++  assert.equal(contract.rules.filter(({ coverage }) => coverage === "catalog-only").length, 101);
+ });
+ 
+ test("adversarial cases reference only automated rule IDs", () => {
+@@ -50,16 +52,42 @@ test("every automated rule has an independent adversarial base contract", () =>
+ });
+ 
+ test("torture policy has four mutation operators and nine ecosystem projects", () => {
+-  assert.equal(torture.automatedRuleCount, 23);
+-  assert.equal(torture.canonicalCases, 46);
++  assert.equal(torture.automatedRuleCount, 27);
++  assert.equal(torture.canonicalCases, 54);
+   assert.equal(torture.generatedVariants.length, 4);
+-  assert.equal(torture.generatedMutationCases, 184);
+-  assert.equal(torture.independentAdversarialBaseCases, 23);
+-  assert.equal(torture.independentAdversarialCasesWithVariants, 115);
++  assert.equal(torture.generatedMutationCases, 216);
++  assert.equal(torture.independentAdversarialBaseCases, 27);
++  assert.equal(torture.independentAdversarialCasesWithVariants, 135);
+   assert.equal(frameworks.projects.length, 9);
+   assert.equal(new Set(frameworks.projects.map(({ id }) => id)).size, 9);
+ });
+ 
++
++test("automation matrix independently classifies all 128 rules", () => {
++  assert.equal(automationMatrix.catalogRuleCount, 128);
++  assert.equal(automationMatrix.rules.length, 128);
++  assert.equal(
++    new Set(automationMatrix.rules.map(({ ruleId }) => ruleId)).size,
++    128,
++  );
++  const automated = automationMatrix.rules
++    .filter(({ status }) => status === "automated")
++    .map(({ ruleId }) => ruleId)
++    .sort();
++  const contracted = contract.rules
++    .filter(({ coverage }) => coverage === "automated")
++    .map(({ ruleId }) => ruleId)
++    .sort();
++  assert.deepEqual(automated, contracted);
++});
++
++test("published v0.27.0 keeps its frozen 23-rule release contract", () => {
++  assert.equal(releaseV027.releaseRef, "v0.27.0");
++  assert.equal(releaseV027.automatedRuleCount, 23);
++  assert.equal(releaseV027.ruleIds.length, 23);
++  assert.equal(new Set(releaseV027.ruleIds).size, 23);
++});
++
+ test("workflow tests candidate and immutable v0.27.0 without stale v0.25 references", () => {
+   assert.match(workflow, /uses: \.\/\.coding-bible-under-test/u);
+   assert.match(workflow, /uses: Xanhast-pf\/coding-bible@v0\.27\.0/u);
+diff --git a/scripts/verify-catalog.mjs b/scripts/verify-catalog.mjs
+index 2b871606a49291b8ae1dfe984ebfd00ef743f2a4..3af7f4e922f5244c2442b9a4f9322bd7e2c95945 100644
+--- a/scripts/verify-catalog.mjs
++++ b/scripts/verify-catalog.mjs
+@@ -10,6 +10,7 @@ import {
+ } from "./lib/conformance.mjs";
+ 
+ const expected = contract();
++const automationMatrix = readJson(new URL("../contracts/automation-matrix.json", import.meta.url));
+ const catalog = readJson(candidateRulesPath());
+ const contractIds = expected.rules.map(({ ruleId }) => ruleId);
+ const catalogIds = catalog.rules.map(({ id }) => id);
+@@ -19,6 +20,14 @@ assert(expected.rules.length === 128, `Expected 128 contract entries, got ${expe
+ assert(new Set(contractIds).size === contractIds.length, "Canary rule contracts contain duplicate IDs.");
+ assert(catalog.ruleCount === 128, `Candidate catalog reports ${catalog.ruleCount} rules, expected 128.`);
+ assert(sameSet(contractIds, catalogIds), "Candidate rule catalog IDs differ from the independent canary contract.");
++assert(
++  automationMatrix.rules.length === 128 &&
++    sameSet(
++      automationMatrix.rules.map(({ ruleId }) => ruleId),
++      contractIds,
++    ),
++  "Independent automation matrix must classify the same 128-rule catalog.",
++);
+ 
+ for (const rule of catalog.rules) {
+   assert(typeof rule.title === "string" && rule.title.trim(), `${rule.id} is missing title.`);
+@@ -31,17 +40,34 @@ for (const rule of catalog.rules) {
+ const analyzer = await importCandidate("packages/analyzer/src/index.ts");
+ const candidateAutomated = [...analyzer.analyzerRuleIds].sort();
+ const expectedAutomated = automatedRuleIds();
+-assert(expected.automatedRuleCount === 23, "Canary automated rule denominator must be 23.");
++assert(expected.automatedRuleCount === expectedAutomated.length, `Canary automated rule denominator ${expected.automatedRuleCount} != ${expectedAutomated.length}.`);
+ assert(
+   sameSet(candidateAutomated, expectedAutomated),
+   `Candidate automated rule set drifted.\nExpected: ${expectedAutomated.join(", ")}\nActual:   ${candidateAutomated.join(", ")}`,
+ );
++const matrixAutomated = automationMatrix.rules
++  .filter(({ status }) => status === "automated")
++  .map(({ ruleId }) => ruleId)
++  .sort();
++assert(
++  sameSet(matrixAutomated, expectedAutomated),
++  "Automation matrix automated set differs from Canary's promotion contract.",
++);
+ 
++const classificationCounts = Object.fromEntries(
++  [...new Set(automationMatrix.rules.map(({ status }) => status))]
++    .sort()
++    .map((status) => [
++      status,
++      automationMatrix.rules.filter((rule) => rule.status === status).length,
++    ]),
++);
+ const report = {
+   catalogRules: catalogIds.length,
+   automatedRules: candidateAutomated.length,
+   catalogOnlyRules: expected.rules.filter(({ coverage }) => coverage === "catalog-only").length,
++  classificationCounts,
+   status: "passed",
+ };
+ writeArtifact("catalog-contract.json", report);
+-console.log(`Catalog contract PASS · ${report.catalogRules}/128 rules represented · ${report.automatedRules}/23 automated`);
++console.log(`Catalog contract PASS · ${report.catalogRules}/128 rules represented · ${report.automatedRules}/${expected.automatedRuleCount} automated`);
+diff --git a/scripts/verify-promotion-gates.mjs b/scripts/verify-promotion-gates.mjs
+index 650133b84b26115df250577f91d6668b960ae5a1..a918ec55f058f4faf2fa1c12531d41988b0ce42d 100644
+--- a/scripts/verify-promotion-gates.mjs
++++ b/scripts/verify-promotion-gates.mjs
+@@ -13,6 +13,7 @@ import { generatedMutationNames } from "./lib/mutations.mjs";
+ 
+ const expected = contract();
+ const policy = readJson(path.join(root, "contracts/torture-policy.json"));
++const automationMatrix = readJson(path.join(root, "contracts/automation-matrix.json"));
+ const adversarial = readJson(path.join(root, "contracts/adversarial.json"));
+ const analyzer = await importCandidate("packages/analyzer/src/index.ts");
+ 
+@@ -29,6 +30,14 @@ assert(
+   ].join("\n"),
+ );
+ 
++const matrixAutomated = automationMatrix.rules
++  .filter(({ status }) => status === "automated")
++  .map(({ ruleId }) => ruleId)
++  .sort();
++assert(
++  sameSet(matrixAutomated, expectedAutomated),
++  "Automation matrix automated set differs from the promotion contract.",
++);
+ assert(
+   expectedAutomated.length === policy.automatedRuleCount,
+   `Promotion policy denominator ${policy.automatedRuleCount} != ${expectedAutomated.length}.`,

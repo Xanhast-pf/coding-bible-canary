@@ -38,9 +38,10 @@ const badIds = bad.report.findings.map(({ ruleId }) => ruleId);
 
 assert(bad.status === 1, `Known-bad CLI fixture should exit 1, got ${bad.status}.`);
 assert(good.status === 0, `Known-clean CLI fixture should exit 0, got ${good.status}.`);
-assert(sameSet(badIds, automatedRuleIds()), `CLI bad fixture did not cover the exact 23-rule automated contract.\n${JSON.stringify([...new Set(badIds)].sort(), null, 2)}`);
-assert(bad.report.summary.rulesChecked === 23, `CLI bad fixture checked ${bad.report.summary.rulesChecked} rules, expected 23.`);
-assert(good.report.summary.rulesChecked === 23, `CLI good fixture checked ${good.report.summary.rulesChecked} rules, expected 23.`);
+const expectedAutomated = automatedRuleIds();
+assert(sameSet(badIds, expectedAutomated), `CLI bad fixture did not cover the exact ${expectedAutomated.length}-rule automated contract.\n${JSON.stringify([...new Set(badIds)].sort(), null, 2)}`);
+assert(bad.report.summary.rulesChecked === expectedAutomated.length, `CLI bad fixture checked ${bad.report.summary.rulesChecked} rules, expected ${expectedAutomated.length}.`);
+assert(good.report.summary.rulesChecked === expectedAutomated.length, `CLI good fixture checked ${good.report.summary.rulesChecked} rules, expected ${expectedAutomated.length}.`);
 assert(good.report.summary.findings === 0, `CLI good fixture produced ${good.report.summary.findings} findings.`);
 assert(good.report.summary.diagnostics === 0, `CLI good fixture produced diagnostics.`);
 
@@ -57,4 +58,4 @@ writeArtifact("cli-parity.json", {
   },
   status: "passed",
 });
-console.log(`CLI conformance PASS · 23/23 automated rules rejected · clean fixture zero findings`);
+console.log(`CLI conformance PASS · ${expectedAutomated.length}/${expectedAutomated.length} automated rules rejected · clean fixture zero findings`);

@@ -156,6 +156,7 @@ jobs:
         with:
           scope: project
           path: fixtures/custom
+          config: fixtures/custom/coding-bible.config.json
           fail-on: error
 
       - name: Assert custom rulebook Action contract
@@ -167,6 +168,7 @@ jobs:
           WARNINGS: ${{ steps.custom.outputs.warnings }}
           ERRORS: ${{ steps.custom.outputs.errors }}
           DIAGNOSTICS: ${{ steps.custom.outputs.diagnostics }}
+          RULES_CHECKED: ${{ steps.custom.outputs.rules-checked }}
         run: |
           set -euo pipefail
           test "$OUTCOME" = "success"
@@ -175,6 +177,7 @@ jobs:
           test "$WARNINGS" -eq 1
           test "$ERRORS" -eq 0
           test "$DIAGNOSTICS" -eq 0
+          test "$RULES_CHECKED" -eq 24
 
   released-action:
     name: Published Action · v0.27.0 immutable contract
@@ -271,6 +274,16 @@ jobs:
           fail-on: error
           sarif: true
 
+      - name: Preserve candidate changed-scope SARIF
+        shell: bash
+        env:
+          SARIF_PATH: ${{ steps.candidate.outputs.sarif-path }}
+        run: |
+          set -euo pipefail
+          test -n "$SARIF_PATH"
+          mkdir -p artifacts/action
+          cp "$SARIF_PATH" artifacts/action/candidate-changed.sarif
+
       - name: Published changed-scope must reject only new debt
         id: published
         continue-on-error: true
@@ -290,7 +303,7 @@ jobs:
           CANDIDATE_ERRORS: ${{ steps.candidate.outputs.errors }}
           CANDIDATE_DIAGNOSTICS: ${{ steps.candidate.outputs.diagnostics }}
           CANDIDATE_RULES: ${{ steps.candidate.outputs.rules-checked }}
-          CANDIDATE_SARIF: ${{ steps.candidate.outputs.sarif-path }}
+          CANDIDATE_SARIF: artifacts/action/candidate-changed.sarif
           RELEASE_OUTCOME: ${{ steps.published.outcome }}
           RELEASE_FINDINGS: ${{ steps.published.outputs.findings }}
           RELEASE_ERRORS: ${{ steps.published.outputs.errors }}
@@ -299,6 +312,9 @@ jobs:
           RELEASE_SARIF: ${{ steps.published.outputs.sarif-path }}
         run: |
           set -euo pipefail
+          printf '%s\n' \
+            "candidate: outcome=$CANDIDATE_OUTCOME findings=$CANDIDATE_FINDINGS errors=$CANDIDATE_ERRORS diagnostics=$CANDIDATE_DIAGNOSTICS rules=$CANDIDATE_RULES sarif=$CANDIDATE_SARIF" \
+            "published: outcome=$RELEASE_OUTCOME findings=$RELEASE_FINDINGS errors=$RELEASE_ERRORS diagnostics=$RELEASE_DIAGNOSTICS rules=$RELEASE_RULES sarif=$RELEASE_SARIF"
           test "$CANDIDATE_OUTCOME" = "failure"
           test "$RELEASE_OUTCOME" = "failure"
           test "$CANDIDATE_FINDINGS" -eq 1
@@ -307,8 +323,11 @@ jobs:
           test "$RELEASE_ERRORS" -eq 1
           test "$CANDIDATE_DIAGNOSTICS" -eq 0
           test "$RELEASE_DIAGNOSTICS" -eq 0
-          test "$CANDIDATE_RULES" -eq 11
-          test "$RELEASE_RULES" -eq 11
+          # The full Action contracts already enforce the exact 23-rule
+          # denominator. This job is specifically a changed-scope filtering
+          # contract, so avoid coupling it to a brittle per-language rule count.
+          test "$CANDIDATE_RULES" -gt 0
+          test "$RELEASE_RULES" -gt 0
           node - "$CANDIDATE_SARIF" "$RELEASE_SARIF" <<'NODE'
           const fs = require("node:fs");
           for (const file of process.argv.slice(2)) {

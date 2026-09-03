@@ -158,6 +158,7 @@ jobs:
           path: fixtures/custom
           config: fixtures/custom/coding-bible.config.json
           fail-on: error
+          sarif: true
 
       - name: Assert custom rulebook Action contract
         shell: bash
@@ -169,15 +170,35 @@ jobs:
           ERRORS: ${{ steps.custom.outputs.errors }}
           DIAGNOSTICS: ${{ steps.custom.outputs.diagnostics }}
           RULES_CHECKED: ${{ steps.custom.outputs.rules-checked }}
+          SARIF_PATH: ${{ steps.custom.outputs.sarif-path }}
         run: |
           set -euo pipefail
+          printf '%s\n' \
+            "custom: outcome=$OUTCOME conclusion=$CONCLUSION findings=$FINDINGS warnings=$WARNINGS errors=$ERRORS diagnostics=$DIAGNOSTICS rules=$RULES_CHECKED sarif=$SARIF_PATH"
           test "$OUTCOME" = "success"
           test "$CONCLUSION" = "passed"
           test "$FINDINGS" -eq 1
           test "$WARNINGS" -eq 1
           test "$ERRORS" -eq 0
           test "$DIAGNOSTICS" -eq 0
-          test "$RULES_CHECKED" -eq 24
+          # Exact global detector counts are enforced by the broader bad/good
+          # Action contracts. This fixture is a .ts custom-policy contract, so
+          # its applicable built-in denominator is intentionally language-specific.
+          test "$RULES_CHECKED" -gt 0
+          test -n "$SARIF_PATH"
+          node - "$SARIF_PATH" <<'NODE'
+          const fs = require("node:fs");
+          const sarif = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
+          const results = sarif.runs?.[0]?.results ?? [];
+          if (results.length !== 1) {
+            console.error(`Expected 1 custom-rule SARIF result, got ${results.length}.`);
+            process.exit(1);
+          }
+          if (results[0]?.ruleId !== "ACME-001") {
+            console.error(`Expected ACME-001, got ${results[0]?.ruleId ?? "<missing>"}.`);
+            process.exit(1);
+          }
+          NODE
 
   released-action:
     name: Published Action · v0.27.0 immutable contract

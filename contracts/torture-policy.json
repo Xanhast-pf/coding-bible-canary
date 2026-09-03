@@ -1,0 +1,23 @@
+{
+  "formatVersion": 1,
+  "automatedRuleCount": 23,
+  "canonicalCases": 46,
+  "generatedVariants": [
+    "leading-comment",
+    "trailing-comment",
+    "safe-module-const",
+    "safe-helper"
+  ],
+  "generatedMutationCases": 184,
+  "minimumIndependentAdversarialCasesPerAutomatedRule": 1,
+  "independentAdversarialBaseCases": 23,
+  "independentAdversarialCasesWithVariants": 115,
+  "requiredConsumers": [
+    "library",
+    "cli",
+    "browser",
+    "action"
+  ],
+  "frameworkProjects": 9,
+  "performanceFiles": 1000
+}

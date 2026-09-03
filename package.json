@@ -9,8 +9,11 @@
   "scripts": {
     "test": "node --test scripts/test/*.test.mjs",
     "contract:verify": "node scripts/verify-catalog.mjs",
+    "contract:promotion": "node scripts/verify-promotion-gates.mjs",
     "conformance:canonical": "node scripts/run-canonical-conformance.mjs",
     "conformance:adversarial": "node scripts/run-adversarial-conformance.mjs",
+    "conformance:mutations": "node scripts/run-mutation-conformance.mjs",
+    "conformance:frameworks": "node scripts/run-framework-matrix.mjs",
     "conformance:cli": "node scripts/run-cli-conformance.mjs",
     "conformance:browser": "node scripts/run-browser-parity.mjs",
     "conformance:config": "node scripts/run-config-matrix.mjs",

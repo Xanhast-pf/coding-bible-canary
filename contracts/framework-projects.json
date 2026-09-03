@@ -1,0 +1,59 @@
+{
+  "formatVersion": 1,
+  "projects": [
+    {
+      "id": "react-clean",
+      "ecosystem": "react",
+      "path": "fixtures/frameworks/react-clean",
+      "minimumSourceFiles": 1
+    },
+    {
+      "id": "apollo-clean",
+      "ecosystem": "apollo",
+      "path": "fixtures/frameworks/apollo-clean",
+      "minimumSourceFiles": 1
+    },
+    {
+      "id": "redux-clean",
+      "ecosystem": "redux",
+      "path": "fixtures/frameworks/redux-clean",
+      "minimumSourceFiles": 1
+    },
+    {
+      "id": "legend-clean",
+      "ecosystem": "legend-state",
+      "path": "fixtures/frameworks/legend-clean",
+      "minimumSourceFiles": 1
+    },
+    {
+      "id": "nextjs-clean",
+      "ecosystem": "nextjs",
+      "path": "fixtures/frameworks/nextjs-clean",
+      "minimumSourceFiles": 1
+    },
+    {
+      "id": "tanstack-query-clean",
+      "ecosystem": "tanstack-query",
+      "path": "fixtures/frameworks/tanstack-query-clean",
+      "minimumSourceFiles": 1
+    },
+    {
+      "id": "graphql-clean",
+      "ecosystem": "graphql",
+      "path": "fixtures/frameworks/graphql-clean",
+      "minimumSourceFiles": 1
+    },
+    {
+      "id": "mixed-js-ts-clean",
+      "ecosystem": "mixed-js-ts",
+      "path": "fixtures/frameworks/mixed-js-ts-clean",
+      "minimumSourceFiles": 2
+    },
+    {
+      "id": "monorepo-clean",
+      "ecosystem": "monorepo",
+      "path": "fixtures/frameworks/monorepo-clean",
+      "minimumSourceFiles": 2
+    }
+  ]
+}

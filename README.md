@@ -26,14 +26,22 @@ For automated rules, the canary checks several independent surfaces:
 2. canonical DO examples must remain clean;
 3. independent adversarial/near-neighbor cases must not create known false
    positives;
-4. the aggregate bad project must exercise the exact automated rule set;
-5. the aggregate clean project must stay clean;
-6. CLI and browser consumers must preserve the same contract;
-7. the GitHub Action must preserve the same external project/SARIF contract;
-8. includes, ignores, severities, overrides, rule selection, custom rulebooks,
-   malformed source, and cache behavior are tortured independently;
-9. changed-line scope must report only newly introduced debt;
-10. a 1,000-file clean project provides a generous CI performance regression
+4. every canonical bad/good example is re-run through four generated,
+   syntax-preserving mutations to catch brittle false negatives and false
+   positives;
+5. every independent adversarial case is also expanded through those mutation
+   operators;
+6. nine clean framework/project fixtures exercise React, Apollo, Redux,
+   Legend-State, Next.js, TanStack Query, GraphQL, mixed JS/TS, and monorepo
+   boundaries without allowing known false positives;
+7. the aggregate bad project must exercise the exact automated rule set;
+8. the aggregate clean project must stay clean;
+9. CLI and browser consumers must preserve the same contract;
+10. the GitHub Action must preserve the same external project/SARIF contract;
+11. includes, ignores, severities, overrides, rule selection, custom rulebooks,
+    malformed source, and cache behavior are tortured independently;
+12. changed-line scope must report only newly introduced debt;
+13. a 1,000-file clean project provides a generous CI performance regression
     guard rather than a fragile benchmark race.
 
 The suite is intentionally designed so **zero work can never equal success**.
@@ -64,7 +72,13 @@ uses: Xanhast-pf/coding-bible@v0.27.0
 That lane answers a different question: does the exact artifact users already
 consume still behave as promised?
 
-## Rule promotion workflow
+## Detector promotion gate
+
+Canary treats `automated` as a promotion with prerequisites, not a metadata
+label. A candidate analyzer is rejected if its automated rule set differs from
+the independently checked-in contract. Every automated rule must also have
+canonical examples, all required consumer lanes, at least one independent
+adversarial base case, and the generated mutation matrix.
 
 New detectors should make the canary harder **before** they make the automated
 coverage number larger:
@@ -91,7 +105,10 @@ Deep conformance commands require a checked-out Coding Bible candidate:
 ```bash
 CODING_BIBLE_ROOT=../coding-bible node scripts/verify-catalog.mjs
 CODING_BIBLE_ROOT=../coding-bible node scripts/run-canonical-conformance.mjs
+CODING_BIBLE_ROOT=../coding-bible node scripts/verify-promotion-gates.mjs
 CODING_BIBLE_ROOT=../coding-bible node scripts/run-adversarial-conformance.mjs
+CODING_BIBLE_ROOT=../coding-bible node scripts/run-mutation-conformance.mjs
+CODING_BIBLE_ROOT=../coding-bible node scripts/run-framework-matrix.mjs
 CODING_BIBLE_ROOT=../coding-bible node scripts/run-cli-conformance.mjs
 CODING_BIBLE_ROOT=../coding-bible node scripts/run-browser-parity.mjs
 CODING_BIBLE_ROOT=../coding-bible node scripts/run-config-matrix.mjs

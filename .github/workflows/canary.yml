@@ -59,11 +59,20 @@ jobs:
       - name: Verify 128-rule catalog contract
         run: node scripts/verify-catalog.mjs
 
+      - name: Verify detector promotion gates
+        run: node scripts/verify-promotion-gates.mjs
+
       - name: Verify canonical detector contracts
         run: node scripts/run-canonical-conformance.mjs
 
       - name: Run independent adversarial negatives
         run: node scripts/run-adversarial-conformance.mjs
+
+      - name: Run generated mutation torture matrix
+        run: node scripts/run-mutation-conformance.mjs
+
+      - name: Run framework and project false-positive matrix
+        run: node scripts/run-framework-matrix.mjs
 
       - name: Verify CLI consumer contract
         run: node scripts/run-cli-conformance.mjs
@@ -199,6 +208,76 @@ jobs:
             process.exit(1);
           }
           NODE
+
+
+  framework-action-matrix:
+    name: Framework Action parity · ${{ matrix.project }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - react-clean
+          - apollo-clean
+          - redux-clean
+          - legend-clean
+          - nextjs-clean
+          - tanstack-query-clean
+          - graphql-clean
+          - mixed-js-ts-clean
+          - monorepo-clean
+    steps:
+      - name: Checkout canary
+        uses: actions/checkout@v7
+
+      - name: Checkout Coding Bible candidate
+        uses: actions/checkout@v7
+        with:
+          repository: Xanhast-pf/coding-bible
+          ref: ${{ env.CANDIDATE_REF }}
+          path: .coding-bible-under-test
+          persist-credentials: false
+
+      - name: Candidate Action must keep framework fixture clean
+        id: candidate
+        uses: ./.coding-bible-under-test
+        with:
+          scope: project
+          path: fixtures/frameworks/${{ matrix.project }}
+          fail-on: error
+
+      - name: Published Action must keep framework fixture clean
+        id: published
+        uses: Xanhast-pf/coding-bible@v0.27.0
+        with:
+          scope: project
+          path: fixtures/frameworks/${{ matrix.project }}
+          fail-on: error
+
+      - name: Assert framework Action parity
+        shell: bash
+        env:
+          CANDIDATE_OUTCOME: ${{ steps.candidate.outcome }}
+          CANDIDATE_FINDINGS: ${{ steps.candidate.outputs.findings }}
+          CANDIDATE_DIAGNOSTICS: ${{ steps.candidate.outputs.diagnostics }}
+          CANDIDATE_RULES: ${{ steps.candidate.outputs.rules-checked }}
+          RELEASE_OUTCOME: ${{ steps.published.outcome }}
+          RELEASE_FINDINGS: ${{ steps.published.outputs.findings }}
+          RELEASE_DIAGNOSTICS: ${{ steps.published.outputs.diagnostics }}
+          RELEASE_RULES: ${{ steps.published.outputs.rules-checked }}
+        run: |
+          set -euo pipefail
+          printf '%s\n' \
+            "candidate: outcome=$CANDIDATE_OUTCOME findings=$CANDIDATE_FINDINGS diagnostics=$CANDIDATE_DIAGNOSTICS rules=$CANDIDATE_RULES" \
+            "published: outcome=$RELEASE_OUTCOME findings=$RELEASE_FINDINGS diagnostics=$RELEASE_DIAGNOSTICS rules=$RELEASE_RULES"
+          test "$CANDIDATE_OUTCOME" = "success"
+          test "$RELEASE_OUTCOME" = "success"
+          test "$CANDIDATE_FINDINGS" -eq 0
+          test "$RELEASE_FINDINGS" -eq 0
+          test "$CANDIDATE_DIAGNOSTICS" -eq 0
+          test "$RELEASE_DIAGNOSTICS" -eq 0
+          test "$CANDIDATE_RULES" -gt 0
+          test "$RELEASE_RULES" -gt 0
 
   released-action:
     name: Published Action · v0.27.0 immutable contract

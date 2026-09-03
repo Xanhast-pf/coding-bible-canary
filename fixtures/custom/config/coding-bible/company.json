@@ -1,0 +1,19 @@
+{
+  "formatVersion": 1,
+  "name": "canary-company-policy",
+  "rules": [
+    {
+      "confidence": "certain",
+      "id": "ACME-001",
+      "impact": "high",
+      "match": {
+        "kind": "import",
+        "source": "@vendor/raw-analytics"
+      },
+      "message": "Application code must not import the raw analytics client.",
+      "rationale": "The company wrapper owns consent and event conventions.",
+      "suggestion": "Import @company/analytics instead.",
+      "title": "Use the company analytics wrapper"
+    }
+  ]
+}

@@ -1,84 +1,145 @@
-name: Coding Bible release canary
+name: Coding Bible conformance lab
 
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      coding_bible_ref:
+        description: Coding Bible branch, tag, or SHA to test as the candidate
+        required: false
+        default: main
+  repository_dispatch:
+    types: [coding-bible-candidate]
 
 permissions:
   contents: read
 
-jobs:
-  project-contract:
-    name: Project scan contract · v0.25.0
-    runs-on: ubuntu-latest
+env:
+  CODING_BIBLE_ROOT: .coding-bible-under-test
+  CANDIDATE_REF: ${{ github.event.client_payload.ref || inputs.coding_bible_ref || 'main' }}
 
+jobs:
+  candidate-conformance:
+    name: Candidate · catalog/library/CLI/browser/config/perf
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout canary
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - name: Known-bad fixture must be rejected
+      - name: Checkout Coding Bible candidate
+        uses: actions/checkout@v7
+        with:
+          repository: Xanhast-pf/coding-bible
+          ref: ${{ env.CANDIDATE_REF }}
+          path: .coding-bible-under-test
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          version: 10.15.0
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .coding-bible-under-test/.nvmrc
+
+      - name: Install candidate dependencies
+        working-directory: .coding-bible-under-test
+        run: pnpm install --frozen-lockfile
+
+      - name: Self-test the canary harness
+        run: node --test scripts/test/*.test.mjs
+
+      - name: Verify 128-rule catalog contract
+        run: node scripts/verify-catalog.mjs
+
+      - name: Verify canonical detector contracts
+        run: node scripts/run-canonical-conformance.mjs
+
+      - name: Run independent adversarial negatives
+        run: node scripts/run-adversarial-conformance.mjs
+
+      - name: Verify CLI consumer contract
+        run: node scripts/run-cli-conformance.mjs
+
+      - name: Verify browser consumer contract
+        run: node scripts/run-browser-parity.mjs
+
+      - name: Torture configuration and custom-rule boundaries
+        run: node scripts/run-config-matrix.mjs
+
+      - name: Performance regression guard
+        env:
+          CANARY_PERF_FILES: 1000
+          CANARY_PERF_MAX_MS: 30000
+        run: node scripts/run-performance.mjs
+
+      - name: Render conformance summary
+        if: always()
+        run: node scripts/render-report.mjs
+
+      - name: Upload candidate conformance artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coding-bible-candidate-conformance
+          path: artifacts/
+          if-no-files-found: warn
+
+  candidate-action:
+    name: Candidate · external GitHub Action contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout canary
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Checkout Coding Bible candidate
+        uses: actions/checkout@v7
+        with:
+          repository: Xanhast-pf/coding-bible
+          ref: ${{ env.CANDIDATE_REF }}
+          path: .coding-bible-under-test
+          persist-credentials: false
+
+      - name: Candidate known-bad fixture must be rejected
         id: bad
         continue-on-error: true
-        uses: Xanhast-pf/coding-bible@v0.25.0
+        uses: ./.coding-bible-under-test
         with:
           scope: project
           path: fixtures/bad
           fail-on: error
+          sarif: true
 
-      - name: Assert rejection contract
-        shell: bash
+      - name: Assert candidate rejection and SARIF contract
         env:
           OUTCOME: ${{ steps.bad.outcome }}
           CONCLUSION: ${{ steps.bad.outputs.conclusion }}
           FINDINGS: ${{ steps.bad.outputs.findings }}
           ERRORS: ${{ steps.bad.outputs.errors }}
+          WARNINGS: ${{ steps.bad.outputs.warnings }}
           DIAGNOSTICS: ${{ steps.bad.outputs.diagnostics }}
           RULES_CHECKED: ${{ steps.bad.outputs.rules-checked }}
           SARIF_PATH: ${{ steps.bad.outputs.sarif-path }}
-        run: |
-          set -euo pipefail
-          test "$OUTCOME" = "failure"
-          test "$CONCLUSION" = "failed"
-          test "$FINDINGS" -ge 19
-          test "$ERRORS" -ge 1
-          test "$DIAGNOSTICS" -eq 0
-          test "$RULES_CHECKED" -eq 19
-          test -n "$SARIF_PATH"
-          test -f "$SARIF_PATH"
+        run: node scripts/assert-action-output.mjs bad
 
-          node -e '
-            const fs = require("node:fs");
-            const sarif = JSON.parse(fs.readFileSync(process.env.SARIF_PATH, "utf8"));
-            if (sarif.version !== "2.1.0") process.exit(1);
-            const results = sarif.runs?.[0]?.results ?? [];
-            if (results.length < 19) process.exit(1);
-            const actual = [...new Set(results.map((result) => result.ruleId))].sort();
-            const expected = [
-              "A11Y-001", "A11Y-002", "A11Y-004", "CORE-003", "GQL-002",
-              "JS-002", "JS-003", "JS-004", "JS-006", "LEGEND-001",
-              "REACT-006", "REACT-008", "REACT-009", "REACT-010", "REACT-011",
-              "REACT-012", "TS-001", "TS-003", "TS-004",
-            ].sort();
-            if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-              console.error({ actual, expected });
-              process.exit(1);
-            }
-          '
-
-      - name: Known-clean fixture must pass
+      - name: Candidate known-clean fixture must pass
         id: good
-        uses: Xanhast-pf/coding-bible@v0.25.0
+        uses: ./.coding-bible-under-test
         with:
           scope: project
           path: fixtures/good
           fail-on: error
 
-      - name: Assert clean contract
-        shell: bash
+      - name: Assert candidate clean contract
         env:
           OUTCOME: ${{ steps.good.outcome }}
           CONCLUSION: ${{ steps.good.outputs.conclusion }}
@@ -87,50 +148,122 @@ jobs:
           WARNINGS: ${{ steps.good.outputs.warnings }}
           DIAGNOSTICS: ${{ steps.good.outputs.diagnostics }}
           RULES_CHECKED: ${{ steps.good.outputs.rules-checked }}
+        run: node scripts/assert-action-output.mjs good
+
+      - name: Candidate custom rulebook must participate in Action analysis
+        id: custom
+        uses: ./.coding-bible-under-test
+        with:
+          scope: project
+          path: fixtures/custom
+          fail-on: error
+
+      - name: Assert custom rulebook Action contract
+        shell: bash
+        env:
+          OUTCOME: ${{ steps.custom.outcome }}
+          CONCLUSION: ${{ steps.custom.outputs.conclusion }}
+          FINDINGS: ${{ steps.custom.outputs.findings }}
+          WARNINGS: ${{ steps.custom.outputs.warnings }}
+          ERRORS: ${{ steps.custom.outputs.errors }}
+          DIAGNOSTICS: ${{ steps.custom.outputs.diagnostics }}
         run: |
           set -euo pipefail
           test "$OUTCOME" = "success"
           test "$CONCLUSION" = "passed"
-          test "$FINDINGS" -eq 0
+          test "$FINDINGS" -eq 1
+          test "$WARNINGS" -eq 1
           test "$ERRORS" -eq 0
-          test "$WARNINGS" -eq 0
           test "$DIAGNOSTICS" -eq 0
-          test "$RULES_CHECKED" -eq 19
 
-  changed-lines-contract:
-    name: Changed-line contract · v0.25.0
+  released-action:
+    name: Published Action · v0.27.0 immutable contract
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout canary
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - name: Create an unpushed test commit
+      - name: Published known-bad fixture must be rejected
+        id: bad
+        continue-on-error: true
+        uses: Xanhast-pf/coding-bible@v0.27.0
+        with:
+          scope: project
+          path: fixtures/bad
+          fail-on: error
+          sarif: true
+
+      - name: Assert published rejection and SARIF contract
+        env:
+          OUTCOME: ${{ steps.bad.outcome }}
+          CONCLUSION: ${{ steps.bad.outputs.conclusion }}
+          FINDINGS: ${{ steps.bad.outputs.findings }}
+          ERRORS: ${{ steps.bad.outputs.errors }}
+          WARNINGS: ${{ steps.bad.outputs.warnings }}
+          DIAGNOSTICS: ${{ steps.bad.outputs.diagnostics }}
+          RULES_CHECKED: ${{ steps.bad.outputs.rules-checked }}
+          SARIF_PATH: ${{ steps.bad.outputs.sarif-path }}
+        run: node scripts/assert-action-output.mjs bad
+
+      - name: Published known-clean fixture must pass
+        id: good
+        uses: Xanhast-pf/coding-bible@v0.27.0
+        with:
+          scope: project
+          path: fixtures/good
+          fail-on: error
+
+      - name: Assert published clean contract
+        env:
+          OUTCOME: ${{ steps.good.outcome }}
+          CONCLUSION: ${{ steps.good.outputs.conclusion }}
+          FINDINGS: ${{ steps.good.outputs.findings }}
+          ERRORS: ${{ steps.good.outputs.errors }}
+          WARNINGS: ${{ steps.good.outputs.warnings }}
+          DIAGNOSTICS: ${{ steps.good.outputs.diagnostics }}
+          RULES_CHECKED: ${{ steps.good.outputs.rules-checked }}
+        run: node scripts/assert-action-output.mjs good
+
+  changed-lines-contract:
+    name: Changed-line contract · candidate + v0.27.0
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout canary
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Checkout Coding Bible candidate
+        uses: actions/checkout@v7
+        with:
+          repository: Xanhast-pf/coding-bible
+          ref: ${{ env.CANDIDATE_REF }}
+          path: .coding-bible-under-test
+          persist-credentials: false
+
+      - name: Create one unpushed violation
         id: commit
         shell: bash
         run: |
           set -euo pipefail
           base_sha="$(git rev-parse HEAD)"
-
           git config user.name "coding-bible-canary"
           git config user.email "coding-bible-canary@users.noreply.github.com"
-
           cat >> fixtures/changed/probe.ts <<'EOF_INNER'
 
           // New violation: changed-scope must report this line and only this TS-001.
           export const introduced: any = "new debt";
           EOF_INNER
-
           git add fixtures/changed/probe.ts
           git commit -m "canary: introduce one new violation"
           echo "base_sha=$base_sha" >> "$GITHUB_OUTPUT"
 
-      - name: New violation must be rejected
-        id: changed
+      - name: Candidate changed-scope must reject only new debt
+        id: candidate
         continue-on-error: true
-        uses: Xanhast-pf/coding-bible@v0.25.0
+        uses: ./.coding-bible-under-test
         with:
           scope: changed
           path: fixtures/changed
@@ -138,30 +271,49 @@ jobs:
           fail-on: error
           sarif: true
 
-      - name: Assert changed-line filtering
+      - name: Published changed-scope must reject only new debt
+        id: published
+        continue-on-error: true
+        uses: Xanhast-pf/coding-bible@v0.27.0
+        with:
+          scope: changed
+          path: fixtures/changed
+          base-ref: ${{ steps.commit.outputs.base_sha }}
+          fail-on: error
+          sarif: true
+
+      - name: Assert both changed-line consumers
         shell: bash
         env:
-          OUTCOME: ${{ steps.changed.outcome }}
-          CONCLUSION: ${{ steps.changed.outputs.conclusion }}
-          FINDINGS: ${{ steps.changed.outputs.findings }}
-          ERRORS: ${{ steps.changed.outputs.errors }}
-          DIAGNOSTICS: ${{ steps.changed.outputs.diagnostics }}
-          RULES_CHECKED: ${{ steps.changed.outputs.rules-checked }}
-          SARIF_PATH: ${{ steps.changed.outputs.sarif-path }}
+          CANDIDATE_OUTCOME: ${{ steps.candidate.outcome }}
+          CANDIDATE_FINDINGS: ${{ steps.candidate.outputs.findings }}
+          CANDIDATE_ERRORS: ${{ steps.candidate.outputs.errors }}
+          CANDIDATE_DIAGNOSTICS: ${{ steps.candidate.outputs.diagnostics }}
+          CANDIDATE_RULES: ${{ steps.candidate.outputs.rules-checked }}
+          CANDIDATE_SARIF: ${{ steps.candidate.outputs.sarif-path }}
+          RELEASE_OUTCOME: ${{ steps.published.outcome }}
+          RELEASE_FINDINGS: ${{ steps.published.outputs.findings }}
+          RELEASE_ERRORS: ${{ steps.published.outputs.errors }}
+          RELEASE_DIAGNOSTICS: ${{ steps.published.outputs.diagnostics }}
+          RELEASE_RULES: ${{ steps.published.outputs.rules-checked }}
+          RELEASE_SARIF: ${{ steps.published.outputs.sarif-path }}
         run: |
           set -euo pipefail
-          test "$OUTCOME" = "failure"
-          test "$CONCLUSION" = "failed"
-          test "$FINDINGS" -eq 1
-          test "$ERRORS" -eq 1
-          test "$DIAGNOSTICS" -eq 0
-          test "$RULES_CHECKED" -eq 11
-          test -f "$SARIF_PATH"
-
-          node -e '
-            const fs = require("node:fs");
-            const sarif = JSON.parse(fs.readFileSync(process.env.SARIF_PATH, "utf8"));
+          test "$CANDIDATE_OUTCOME" = "failure"
+          test "$RELEASE_OUTCOME" = "failure"
+          test "$CANDIDATE_FINDINGS" -eq 1
+          test "$RELEASE_FINDINGS" -eq 1
+          test "$CANDIDATE_ERRORS" -eq 1
+          test "$RELEASE_ERRORS" -eq 1
+          test "$CANDIDATE_DIAGNOSTICS" -eq 0
+          test "$RELEASE_DIAGNOSTICS" -eq 0
+          test "$CANDIDATE_RULES" -eq 11
+          test "$RELEASE_RULES" -eq 11
+          node - "$CANDIDATE_SARIF" "$RELEASE_SARIF" <<'NODE'
+          const fs = require("node:fs");
+          for (const file of process.argv.slice(2)) {
+            const sarif = JSON.parse(fs.readFileSync(file, "utf8"));
             const results = sarif.runs?.[0]?.results ?? [];
-            if (results.length !== 1) process.exit(1);
-            if (results[0]?.ruleId !== "TS-001") process.exit(1);
-          '
+            if (results.length !== 1 || results[0]?.ruleId !== "TS-001") process.exit(1);
+          }
+          NODE

@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { observer } from "@legendapp/state/react";
-import { useEffect } from "react";
+import { FormattedMessage } from "react-intl";
+import { useEffect, useState } from "react";
 import { User } from "./types";
 
 type Props = {
@@ -36,11 +37,24 @@ async function loadUser(response: Response) {
   return raw as User;
 }
 
+async function redundantAsync() {
+  return 1;
+}
+
+function forceUser(value: unknown) {
+  return value as User;
+}
+
 export function Dashboard({ user, users }: Props) {
   let activeUser = user;
   const city = user && user.address && user.address.city;
   const sortedUsers = users.sort(compareUsers);
   const options = ["Canada", "France"];
+  const [syncedName, setSyncedName] = useState(user.name);
+
+  useEffect(() => {
+    setSyncedName(user.name);
+  }, [user.name]);
 
   user.name = user.name.trim();
 
@@ -82,9 +96,11 @@ export function Dashboard({ user, users }: Props) {
         ))}
       </ul>
 
+      <p>Save changes</p>
       <p>{city}</p>
       <p>{options.join(", ")}</p>
       <p>{String(query)}</p>
+      <FormattedMessage id="status.synced" defaultMessage={syncedName} />
       {badge}
       <ObservedName />
     </section>
@@ -94,3 +110,5 @@ export function Dashboard({ user, users }: Props) {
 void normalize;
 void parse;
 void loadUser;
+void redundantAsync;
+void forceUser;

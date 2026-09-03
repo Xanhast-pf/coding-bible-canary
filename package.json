@@ -1,0 +1,20 @@
+{
+  "name": "coding-bible-canary",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "test": "node --test scripts/test/*.test.mjs",
+    "contract:verify": "node scripts/verify-catalog.mjs",
+    "conformance:canonical": "node scripts/run-canonical-conformance.mjs",
+    "conformance:adversarial": "node scripts/run-adversarial-conformance.mjs",
+    "conformance:cli": "node scripts/run-cli-conformance.mjs",
+    "conformance:browser": "node scripts/run-browser-parity.mjs",
+    "conformance:config": "node scripts/run-config-matrix.mjs",
+    "conformance:performance": "node scripts/run-performance.mjs",
+    "report": "node scripts/render-report.mjs"
+  }
+}

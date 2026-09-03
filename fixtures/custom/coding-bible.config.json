@@ -1,0 +1,6 @@
+{
+  "customRuleFiles": ["config/coding-bible/company.json"],
+  "rules": {
+    "ACME-001": "warning"
+  }
+}

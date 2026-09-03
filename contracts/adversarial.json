@@ -1,0 +1,189 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "id": "CORE-003-mutated-let",
+      "language": "ts",
+      "source": "let retries = 0; retries += 1; export { retries };",
+      "forbid": [
+        "CORE-003"
+      ]
+    },
+    {
+      "id": "JS-001-real-async",
+      "language": "ts",
+      "source": "export async function load() { await Promise.resolve(); return 1; }",
+      "forbid": [
+        "JS-001"
+      ]
+    },
+    {
+      "id": "JS-002-optional-chain",
+      "language": "ts",
+      "source": "export const city = user?.address?.city;",
+      "forbid": [
+        "JS-002"
+      ]
+    },
+    {
+      "id": "JS-003-default-param",
+      "language": "ts",
+      "source": "export function normalize(items = []) { return items; }",
+      "forbid": [
+        "JS-003"
+      ]
+    },
+    {
+      "id": "JS-004-number-namespace",
+      "language": "ts",
+      "source": "export const page = Number.parseInt(raw, 10);",
+      "forbid": [
+        "JS-004"
+      ]
+    },
+    {
+      "id": "JS-006-copy-before-sort",
+      "language": "ts",
+      "source": "export const sorted = [...users].sort(compareUsers);",
+      "forbid": [
+        "JS-006"
+      ]
+    },
+    {
+      "id": "TS-001-unknown-not-any",
+      "language": "ts",
+      "source": "export const value: unknown = payload;",
+      "forbid": [
+        "TS-001"
+      ]
+    },
+    {
+      "id": "TS-003-value-import",
+      "language": "ts",
+      "source": "import { User } from './types'; export const ctor = User;",
+      "forbid": [
+        "TS-003"
+      ]
+    },
+    {
+      "id": "TS-004-runtime-guard",
+      "language": "ts",
+      "source": "type User = { id: string }; function isUser(value: unknown): value is User { return typeof value === 'object' && value !== null && 'id' in value; } export async function load(response: Response): Promise<User> { const raw: unknown = await response.json(); if (!isUser(raw)) throw new Error('Invalid user'); return raw; }",
+      "forbid": [
+        "TS-004"
+      ]
+    },
+    {
+      "id": "TS-007-narrowed-unknown",
+      "language": "ts",
+      "source": "export const upper = (value: unknown) => typeof value === 'string' ? value.toUpperCase() : '';",
+      "forbid": [
+        "TS-007"
+      ]
+    },
+    {
+      "id": "A11Y-001-native-button",
+      "language": "tsx",
+      "source": "export const View = () => <button type=\"button\" onClick={() => {}}>Open</button>;",
+      "forbid": [
+        "A11Y-001"
+      ]
+    },
+    {
+      "id": "A11Y-002-keyboard-equivalent",
+      "language": "tsx",
+      "source": "export const View = () => <div role=\"button\" tabIndex={0} onClick={open} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') open(); }}>Open</div>;",
+      "forbid": [
+        "A11Y-002"
+      ]
+    },
+    {
+      "id": "A11Y-004-labelled-icon",
+      "language": "tsx",
+      "source": "const Icon = () => <svg aria-hidden=\"true\" />; export const View = () => <button type=\"button\" aria-label=\"Close\"><Icon /></button>;",
+      "forbid": [
+        "A11Y-004"
+      ]
+    },
+    {
+      "id": "GQL-002-variables",
+      "language": "ts",
+      "source": "const query = gql`query User($id: ID!) { user(id: $id) { id } }`; void query;",
+      "forbid": [
+        "GQL-002"
+      ]
+    },
+    {
+      "id": "LEGEND-001-peek",
+      "language": "tsx",
+      "source": "import { observer } from '@legendapp/state/react'; export const Name = observer(() => <span>{store$.name.peek()}</span>);",
+      "forbid": [
+        "LEGEND-001"
+      ]
+    },
+    {
+      "id": "REACT-004-direct-derived",
+      "language": "tsx",
+      "source": "export const Name = ({ first, last }) => <span>{`${first} ${last}`}</span>;",
+      "forbid": [
+        "REACT-004"
+      ]
+    },
+    {
+      "id": "REACT-006-stable-key",
+      "language": "tsx",
+      "source": "export const List = ({ items }) => <>{items.map((item) => <span key={item.id}>{item.name}</span>)}</>;",
+      "forbid": [
+        "REACT-006"
+      ]
+    },
+    {
+      "id": "REACT-008-hoisted-allocation",
+      "language": "tsx",
+      "source": "const OPTIONS = ['a', 'b']; export const View = () => <span>{OPTIONS.join(',')}</span>;",
+      "forbid": [
+        "REACT-008"
+      ]
+    },
+    {
+      "id": "REACT-009-top-level-hook",
+      "language": "tsx",
+      "source": "import { useState } from 'react'; export function View() { const [open] = useState(false); return <span>{String(open)}</span>; }",
+      "forbid": [
+        "REACT-009"
+      ]
+    },
+    {
+      "id": "REACT-010-jsx-component",
+      "language": "tsx",
+      "source": "const Badge = ({ name }) => <strong>{name}</strong>; export const View = () => <Badge name=\"Ada\" />;",
+      "forbid": [
+        "REACT-010"
+      ]
+    },
+    {
+      "id": "REACT-011-no-prop-mutation",
+      "language": "tsx",
+      "source": "export const View = ({ user }) => <span>{user.name.trim()}</span>;",
+      "forbid": [
+        "REACT-011"
+      ]
+    },
+    {
+      "id": "REACT-012-no-suppression",
+      "language": "tsx",
+      "source": "import { useEffect } from 'react'; export function View({ id }) { useEffect(() => { console.log(id); }, [id]); return null; }",
+      "forbid": [
+        "REACT-012"
+      ]
+    },
+    {
+      "id": "I18N-001-localized",
+      "language": "tsx",
+      "source": "import { FormattedMessage } from 'react-intl'; export const Save = () => <button><FormattedMessage id=\"actions.save\" defaultMessage=\"Save\" /></button>;",
+      "forbid": [
+        "I18N-001"
+      ]
+    }
+  ]
+}

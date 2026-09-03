@@ -1,30 +1,108 @@
-# Coding Bible Release Canary
+# Coding Bible Conformance Canary
 
-External contract tests for the published [Coding Bible](https://github.com/Xanhast-pf/coding-bible) GitHub Action.
+An independent external conformance laboratory for
+[Coding Bible](https://github.com/Xanhast-pf/coding-bible).
 
-This repository is intentionally split between known-bad and known-clean fixtures. Its workflow stays green only when the pinned public release behaves as expected:
+This repository is intentionally **not** part of the Coding Bible monorepo. Its
+job is to behave like a hostile real consumer and fail whenever the published or
+candidate product drifts from an independently checked-in contract.
 
-- known-bad code is rejected;
-- known-clean code passes;
-- all 19 currently automated rule IDs are exercised by the TSX fixture;
-- SARIF 2.1.0 is generated with findings;
-- changed-line mode ignores historical debt and reports only newly introduced violations;
-- no Coding Bible, pnpm, npm, or TypeScript install step is required by the consumer repository.
+## What this canary proves
 
-## Release under test
+The canary owns two hard denominators:
+
+- **128 / 128 Coding Bible rules represented** in `contracts/rules.json`;
+- **23 / 23 currently automated rules** required to satisfy external detection
+  contracts.
+
+Every rule is covered even when it is not automated. `catalog-only` rules must
+still exist with complete title, summary, rationale, canonical DON'T code, and
+canonical DO code. They are deliberately **not** required to emit analyzer
+findings until the canary contract is explicitly promoted to `automated`.
+
+For automated rules, the canary checks several independent surfaces:
+
+1. canonical DON'T examples must fire their rule;
+2. canonical DO examples must remain clean;
+3. independent adversarial/near-neighbor cases must not create known false
+   positives;
+4. the aggregate bad project must exercise the exact automated rule set;
+5. the aggregate clean project must stay clean;
+6. CLI and browser consumers must preserve the same contract;
+7. the GitHub Action must preserve the same external project/SARIF contract;
+8. includes, ignores, severities, overrides, rule selection, custom rulebooks,
+   malformed source, and cache behavior are tortured independently;
+9. changed-line scope must report only newly introduced debt;
+10. a 1,000-file clean project provides a generous CI performance regression
+    guard rather than a fragile benchmark race.
+
+The suite is intentionally designed so **zero work can never equal success**.
+Catalog size, automated-rule count, fixture count, files analyzed, and Action
+`rules-checked` outputs are asserted explicitly.
+
+## Two product lanes
+
+### Candidate lane
+
+The workflow checks out `Xanhast-pf/coding-bible` separately and tests the
+requested branch/tag/SHA (default: `main`). This exercises analyzer library,
+CLI, browser analyzer, current committed Action runtime, configuration, custom
+rules, and performance outside the Coding Bible repository.
+
+Manual runs can select another ref. Coding Bible itself can eventually trigger
+this workflow using the `coding-bible-candidate` repository-dispatch event and a
+specific candidate SHA.
+
+### Published lane
+
+The immutable external Action contract remains pinned to:
 
 ```yaml
-uses: Xanhast-pf/coding-bible@v0.25.0
+uses: Xanhast-pf/coding-bible@v0.27.0
 ```
 
-The canary intentionally pins the exact release. Update the pin in `.github/workflows/canary.yml` when validating a new release candidate/tag.
+That lane answers a different question: does the exact artifact users already
+consume still behave as promised?
 
-## Why expected failures do not make CI red
+## Rule promotion workflow
 
-The bad-code Action steps use `continue-on-error: true`. The following assertion steps then require their outcome to be `failure`. If Coding Bible unexpectedly accepts bad code, the assertion fails and the canary becomes red.
+New detectors should make the canary harder **before** they make the automated
+coverage number larger:
 
-Likewise, the clean fixture must complete successfully with zero findings. This tests both false negatives and false positives.
+1. represent the rule in `contracts/rules.json`;
+2. add independent good/bad/adversarial cases;
+3. implement the detector in Coding Bible;
+4. change the canary contract from `catalog-only` to `automated`;
+5. require canonical, adversarial, CLI/browser, and Action conformance to pass.
 
-## Fixture provenance
+If a detector cannot satisfy the negative/adversarial contract without broad
+heuristics, it is not ready to be promoted.
 
-The initial `fixtures/bad/all-violations.tsx` and `fixtures/good/all-clean.tsx` cases mirror Coding Bible's own analyzer integration fixtures for v0.25.0, but they are executed here through the **published GitHub Action**, outside the Coding Bible monorepo.
+## Local canary sanity tests
+
+The canary itself has no runtime dependencies:
+
+```bash
+node --test scripts/test/*.test.mjs
+```
+
+Deep conformance commands require a checked-out Coding Bible candidate:
+
+```bash
+CODING_BIBLE_ROOT=../coding-bible node scripts/verify-catalog.mjs
+CODING_BIBLE_ROOT=../coding-bible node scripts/run-canonical-conformance.mjs
+CODING_BIBLE_ROOT=../coding-bible node scripts/run-adversarial-conformance.mjs
+CODING_BIBLE_ROOT=../coding-bible node scripts/run-cli-conformance.mjs
+CODING_BIBLE_ROOT=../coding-bible node scripts/run-browser-parity.mjs
+CODING_BIBLE_ROOT=../coding-bible node scripts/run-config-matrix.mjs
+```
+
+The CI candidate job installs Coding Bible's own dependencies before running
+these tests so browser/program semantics match the real checkout.
+
+## Conformance artifacts
+
+Candidate runs upload JSON reports plus `artifacts/SUMMARY.md`. These artifacts
+are intended to become the measurable trust record for the analyzer: curated
+positive coverage, known false-positive resistance, consumer parity, config
+behavior, and performance over time.

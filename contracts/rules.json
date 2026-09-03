@@ -1,0 +1,1229 @@
+{
+  "formatVersion": 1,
+  "catalogRuleCount": 128,
+  "automatedRuleCount": 23,
+  "releaseRef": "v0.27.0",
+  "rules": [
+    {
+      "ruleId": "A11Y-001",
+      "pack": "accessibility",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "A11Y-002",
+      "pack": "accessibility",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "A11Y-003",
+      "pack": "accessibility",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "A11Y-004",
+      "pack": "accessibility",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "A11Y-005",
+      "pack": "accessibility",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "A11Y-006",
+      "pack": "accessibility",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "AI-001",
+      "pack": "ai",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "AI-002",
+      "pack": "ai",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "AI-003",
+      "pack": "ai",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "AI-004",
+      "pack": "ai",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "AI-005",
+      "pack": "ai",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "AI-006",
+      "pack": "ai",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "AI-007",
+      "pack": "ai",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "APOLLO-001",
+      "pack": "apollo",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "APOLLO-002",
+      "pack": "apollo",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "APOLLO-003",
+      "pack": "apollo",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "APOLLO-004",
+      "pack": "apollo",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "APOLLO-005",
+      "pack": "apollo",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "APOLLO-006",
+      "pack": "apollo",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "ARCH-001",
+      "pack": "architecture",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "ARCH-002",
+      "pack": "architecture",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "ARCH-003",
+      "pack": "architecture",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "ARCH-004",
+      "pack": "architecture",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "ARCH-005",
+      "pack": "architecture",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "ARCH-006",
+      "pack": "architecture",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "ARCH-007",
+      "pack": "architecture",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CORE-001",
+      "pack": "core",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CORE-002",
+      "pack": "core",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CORE-003",
+      "pack": "core",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "CORE-004",
+      "pack": "core",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CORE-005",
+      "pack": "core",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CORE-006",
+      "pack": "core",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CORE-007",
+      "pack": "core",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CORE-008",
+      "pack": "core",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CORE-009",
+      "pack": "core",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CORE-010",
+      "pack": "core",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CORE-011",
+      "pack": "core",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CSS-001",
+      "pack": "css",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CSS-002",
+      "pack": "css",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CSS-003",
+      "pack": "css",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "CSS-004",
+      "pack": "css",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "DEP-001",
+      "pack": "dependencies",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "DEP-002",
+      "pack": "dependencies",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "DEP-003",
+      "pack": "dependencies",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "DEP-004",
+      "pack": "dependencies",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "FLAG-001",
+      "pack": "feature-flags",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "FLAG-002",
+      "pack": "feature-flags",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "FLAG-003",
+      "pack": "feature-flags",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "FLAG-004",
+      "pack": "feature-flags",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "GQL-001",
+      "pack": "graphql",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "GQL-002",
+      "pack": "graphql",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "GQL-003",
+      "pack": "graphql",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "GQL-004",
+      "pack": "graphql",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "GQL-005",
+      "pack": "graphql",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "GQL-006",
+      "pack": "graphql",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "I18N-001",
+      "pack": "internationalization",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "I18N-002",
+      "pack": "internationalization",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "I18N-003",
+      "pack": "internationalization",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "I18N-004",
+      "pack": "internationalization",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "JS-001",
+      "pack": "javascript",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "JS-002",
+      "pack": "javascript",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "JS-003",
+      "pack": "javascript",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "JS-004",
+      "pack": "javascript",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "JS-005",
+      "pack": "javascript",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "JS-006",
+      "pack": "javascript",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "JS-007",
+      "pack": "javascript",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "LEGEND-001",
+      "pack": "legend-state",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "LEGEND-002",
+      "pack": "legend-state",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "LEGEND-003",
+      "pack": "legend-state",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "LEGEND-004",
+      "pack": "legend-state",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "LEGEND-005",
+      "pack": "legend-state",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "LEGEND-006",
+      "pack": "legend-state",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "NEXT-001",
+      "pack": "nextjs",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "NEXT-002",
+      "pack": "nextjs",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "NEXT-003",
+      "pack": "nextjs",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "NEXT-004",
+      "pack": "nextjs",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "NEXT-005",
+      "pack": "nextjs",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "NEXT-006",
+      "pack": "nextjs",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "PERF-001",
+      "pack": "performance",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "PERF-002",
+      "pack": "performance",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "PERF-003",
+      "pack": "performance",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "PERF-004",
+      "pack": "performance",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REACT-001",
+      "pack": "react",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REACT-002",
+      "pack": "react",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REACT-003",
+      "pack": "react",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REACT-004",
+      "pack": "react",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "REACT-005",
+      "pack": "react",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REACT-006",
+      "pack": "react",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "REACT-007",
+      "pack": "react",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REACT-008",
+      "pack": "react",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "REACT-009",
+      "pack": "react",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "REACT-010",
+      "pack": "react",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "REACT-011",
+      "pack": "react",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "REACT-012",
+      "pack": "react",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "REACT-013",
+      "pack": "react",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-001",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-002",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-003",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-004",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-005",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-006",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-007",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-008",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-009",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-010",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "REDUX-011",
+      "pack": "redux",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TQ-001",
+      "pack": "tanstack-query",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TQ-002",
+      "pack": "tanstack-query",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TQ-003",
+      "pack": "tanstack-query",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TQ-004",
+      "pack": "tanstack-query",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TQ-005",
+      "pack": "tanstack-query",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TEST-001",
+      "pack": "testing",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TEST-002",
+      "pack": "testing",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TEST-003",
+      "pack": "testing",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TEST-004",
+      "pack": "testing",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TEST-005",
+      "pack": "testing",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TEST-006",
+      "pack": "testing",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TS-001",
+      "pack": "typescript",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "TS-002",
+      "pack": "typescript",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TS-003",
+      "pack": "typescript",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "TS-004",
+      "pack": "typescript",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "TS-005",
+      "pack": "typescript",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TS-006",
+      "pack": "typescript",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "TS-007",
+      "pack": "typescript",
+      "coverage": "automated",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "library",
+        "cli",
+        "browser",
+        "action"
+      ]
+    },
+    {
+      "ruleId": "WORK-001",
+      "pack": "workflow",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "WORK-002",
+      "pack": "workflow",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "WORK-003",
+      "pack": "workflow",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    },
+    {
+      "ruleId": "WORK-004",
+      "pack": "workflow",
+      "coverage": "catalog-only",
+      "canonicalExamplesRequired": true,
+      "consumers": [
+        "knowledge"
+      ]
+    }
+  ]
+}

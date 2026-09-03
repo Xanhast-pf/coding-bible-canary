@@ -1,1 +1,5 @@
 .coding-bible/
+.coding-bible-under-test/
+artifacts/
+node_modules/
+.tmp/
